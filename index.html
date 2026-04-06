@@ -166,9 +166,10 @@
                             <div class="form-group">
                                 <label>Model</label>
                                 <select id="groq-model">
-                                    <option value="mixtral-8x7b-32768" selected>Mixtral 8x7B (Recommended)</option>
-                                    <option value="llama3-8b-8192">Llama 3 8B (Fastest)</option>
-                                    <option value="llama3-70b-8192">Llama 3 70B (Most Powerful)</option>
+                                    <option value="llama-3.3-70b-versatile" selected>Llama 3.3 70B (Recommended - Best Quality)</option>
+                                    <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fastest & Cheapest)</option>
+                                    <option value="openai/gpt-oss-20b">GPT OSS 20B (Fastest - 1000 t/s)</option>
+                                    <option value="openai/gpt-oss-120b">GPT OSS 120B (Most Powerful)</option>
                                 </select>
                             </div>
                             <button onclick="saveGroqKey()" class="btn btn-success">💾 Save Settings</button>
@@ -211,7 +212,7 @@
         // Configuration - GROQ IS DEFAULT (FREE)
         let AI_PROVIDER = localStorage.getItem('ai_provider') || 'groq';
         let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
-        let GROQ_MODEL = localStorage.getItem('groq_model') || 'mixtral-8x7b-32768';
+        let GROQ_MODEL = localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile';
         let OPENAI_API_KEY = localStorage.getItem('openai_api_key') || '';
         let OPENAI_MODEL = localStorage.getItem('openai_model') || 'gpt-3.5-turbo';
 
