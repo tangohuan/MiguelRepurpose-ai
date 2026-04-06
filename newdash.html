@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RepurposeAI - Dashboard (Free Version)</title>
+    <title>RepurposeAI - Dashboard (Fixed)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root { --primary-color: #667eea; --bg-color: #f8f9fa; --card-bg: white; --text-color: #2c3e50; }
@@ -78,7 +78,7 @@
         <div id="dashboard-view">
             <div class="card welcome-hero">
                 <h2>Welcome back, <span id="user-email">User</span>! 👋</h2>
-                <p>Your current plan: <strong id="user-plan">Free</strong> (Powered by Groq AI - No API key needed!)</p>
+                <p>Your current plan: <strong id="user-plan">Free</strong> (Powered by Groq AI)</p>
             </div>
 
             <div class="grid">
@@ -146,60 +146,42 @@
 
                         <div class="success-box">
                             <strong>✅ Currently Using: Groq (Free Tier)</strong><br>
-                            <small>No API key required! 1,000,000 tokens/day free.</small>
+                            <small>Get your free API key at console.groq.com</small>
                         </div>
 
                         <div class="form-group">
                             <label>AI Provider</label>
                             <select id="ai-provider" onchange="toggleProvider()">
-                                <option value="groq" selected>🚀 Groq (Free - Recommended)</option>
-                                <option value="openai">🤖 OpenAI (Requires API Key)</option>
-                                <option value="demo">📋 Demo Mode (No AI - Sample Output)</option>
+                                <option value="groq" selected>🚀 Groq (Free)</option>
+                                <option value="demo">📋 Demo Mode (No AI)</option>
                             </select>
                         </div>
 
                         <div id="groq-settings">
                             <div class="form-group">
-                                <label>Groq API Key (Optional - Get free key at groq.com)</label>
-                                <input type="password" id="groq-api-key" placeholder="gsk_... (optional - works without key in demo mode)" style="font-family: monospace;">
+                                <label>Groq API Key (Get free at console.groq.com)</label>
+                                <input type="password" id="groq-api-key" placeholder="gsk_..." style="font-family: monospace;">
                             </div>
                             <div class="form-group">
                                 <label>Model</label>
                                 <select id="groq-model">
-                                    <option value="mixtral-8x7b-32768" selected>Mixtral 8x7B (Recommended)</option>
-                                    <option value="llama3-8b-8192">Llama 3 8B (Fastest)</option>
-                                    <option value="llama3-70b-8192">Llama 3 70B (Most Powerful)</option>
+                                    <option value="llama-3.3-70b-versatile" selected>Llama 3.3 70B Versatile (Best)</option>
+                                    <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant (Fast)</option>
+                                    <option value="llama3-70b-8192">Llama 3 70B 8192 (Legacy)</option>
                                 </select>
                             </div>
                             <button onclick="saveGroqKey()" class="btn btn-success">💾 Save Settings</button>
                             <button onclick="testGroqKey()" class="btn btn-outline">🧪 Test Connection</button>
                         </div>
 
-                        <div id="openai-settings" class="hidden">
-                            <div class="form-group"><label>OpenAI API Key</label><input type="password" id="openai-api-key" placeholder="sk-..." style="font-family: monospace;"></div>
-                            <div class="form-group"><label>Model</label><select id="openai-model"><option value="gpt-3.5-turbo">GPT-3.5 Turbo</option><option value="gpt-4">GPT-4</option><option value="gpt-4-turbo-preview">GPT-4 Turbo</option></select></div>
-                            <button onclick="saveApiKey()" class="btn btn-success">💾 Save API Key</button>
-                            <button onclick="testApiKey()" class="btn btn-outline">🧪 Test Connection</button>
-                            <div class="api-help">
-                                <strong>How to get your OpenAI API Key:</strong>
-                                <ol style="margin-left: 1.2rem; margin-top: 0.5rem;">
-                                    <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
-                                    <li>Sign up or log in</li>
-                                    <li>Click "Create new secret key"</li>
-                                    <li>Copy and paste it here</li>
-                                </ol>
-                            </div>
-                        </div>
-
                         <div id="groq-info" style="margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px;">
-                            <strong>About Groq (Free Alternative):</strong>
-                            <ul style="margin-left: 1.2rem; margin-top: 0.5rem;">
-                                <li>✅ Completely free tier (1M tokens/day)</li>
-                                <li>⚡ Blazing fast inference speed</li>
-                                <li>🔒 No credit card required</li>
-                                <li>🤖 Uses Mixtral & Llama 3 models</li>
-                                <li>🌐 Get your free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></li>
-                            </ul>
+                            <strong>How to get your free Groq API Key:</strong>
+                            <ol style="margin-left: 1.2rem; margin-top: 0.5rem;">
+                                <li>Go to <a href="https://console.groq.com" target="_blank">console.groq.com</a></li>
+                                <li>Sign up (free, no credit card)</li>
+                                <li>Click "API Keys" → "Create API Key"</li>
+                                <li>Copy and paste it here</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
@@ -208,23 +190,33 @@
     </div>
 
     <script>
-        // Configuration - GROQ IS DEFAULT (FREE)
+        // Configuration
         let AI_PROVIDER = localStorage.getItem('ai_provider') || 'groq';
         let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
-        let GROQ_MODEL = localStorage.getItem('groq_model') || 'mixtral-8x7b-32768';
-        let OPENAI_API_KEY = localStorage.getItem('openai_api_key') || '';
-        let OPENAI_MODEL = localStorage.getItem('openai_model') || 'gpt-3.5-turbo';
+        let GROQ_MODEL = localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile';
 
         const FEATURES = {
-            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:\\n\\n' },
-            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post with markdown.', prefix: 'Convert to blog post:\\n\\n' },
-            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste content...', system: 'Create engaging newsletter with subject, greeting, CTA, sign-off.', prefix: 'Create newsletter from:\\n\\n' },
-            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Paste content...', system: 'Create LinkedIn, Twitter, and Instagram versions of this content.', prefix: 'Create social posts from:\\n\\n' },
-            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes from:\\n\\n' },
-            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps, quotes, resources.', prefix: 'Create shownotes from:\\n\\n' }
+            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:
+
+' },
+            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post with markdown.', prefix: 'Convert to blog post:
+
+' },
+            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste content...', system: 'Create engaging newsletter with subject, greeting, CTA, sign-off.', prefix: 'Create newsletter from:
+
+' },
+            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Paste content...', system: 'Create LinkedIn, Twitter, and Instagram versions of this content.', prefix: 'Create social posts from:
+
+' },
+            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes from:
+
+' },
+            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps, quotes, resources.', prefix: 'Create shownotes from:
+
+' }
         };
 
-        // Demo/Sample outputs for when API fails or demo mode
+        // Demo outputs
         const DEMO_OUTPUTS = {
             'blog-to-twitter': `🧵 Thread: 5 Tips for Better Content
 
@@ -355,11 +347,8 @@ Join us next week as we interview a creator who grew to 100k followers using onl
             document.getElementById('account-plan').value = user.plan || 'Free';
             document.getElementById('user-plan').textContent = user.plan || 'Free';
 
-            // Load saved settings
             if (GROQ_API_KEY) document.getElementById('groq-api-key').value = GROQ_API_KEY;
             document.getElementById('groq-model').value = GROQ_MODEL;
-            if (OPENAI_API_KEY) document.getElementById('openai-api-key').value = OPENAI_API_KEY;
-            document.getElementById('openai-model').value = OPENAI_MODEL;
             document.getElementById('ai-provider').value = AI_PROVIDER;
 
             toggleProvider();
@@ -389,17 +378,10 @@ Join us next week as we interview a creator who grew to 100k followers using onl
 
             if (provider === 'groq') {
                 document.getElementById('groq-settings').classList.remove('hidden');
-                document.getElementById('openai-settings').classList.add('hidden');
                 document.getElementById('groq-info').classList.remove('hidden');
-            } else if (provider === 'openai') {
-                document.getElementById('groq-settings').classList.add('hidden');
-                document.getElementById('openai-settings').classList.remove('hidden');
-                document.getElementById('groq-info').classList.add('hidden');
             } else {
-                // Demo mode
                 document.getElementById('groq-settings').classList.add('hidden');
-                document.getElementById('openai-settings').classList.add('hidden');
-                document.getElementById('groq-info').classList.remove('hidden');
+                document.getElementById('groq-info').classList.add('hidden');
             }
         }
 
@@ -448,47 +430,20 @@ Join us next week as we interview a creator who grew to 100k followers using onl
 
         async function testGroqKey() {
             const key = document.getElementById('groq-api-key').value.trim() || GROQ_API_KEY;
+            if (!key) return alert('Enter API key first');
+
             const btn = event.target;
             btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
             btn.disabled = true;
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/models', {
-                    headers: { 'Authorization': `Bearer ${key || 'demo'}` }
+                    headers: { 'Authorization': `Bearer ${key}` }
                 });
-                if (res.ok) {
-                    alert('✅ Groq connection successful!');
-                } else {
-                    alert('❌ Invalid key or demo mode. Get free key at console.groq.com');
-                }
+                alert(res.ok ? '✅ Groq connection successful!' : '❌ Invalid key');
             } catch(e) { 
                 alert('❌ Error: ' + e.message); 
             }
-            btn.textContent = '🧪 Test Connection';
-            btn.disabled = false;
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('openai-api-key').value.trim();
-            if (!key) return alert('Enter API key');
-            if (!key.startsWith('sk-')) return alert('Key must start with sk-');
-            OPENAI_API_KEY = key;
-            OPENAI_MODEL = document.getElementById('openai-model').value;
-            localStorage.setItem('openai_api_key', key);
-            localStorage.setItem('openai_model', OPENAI_MODEL);
-            alert('OpenAI API Key saved!');
-        }
-
-        async function testApiKey() {
-            const key = document.getElementById('openai-api-key').value.trim() || OPENAI_API_KEY;
-            if (!key) return alert('Enter API key first');
-            const btn = event.target;
-            btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
-            btn.disabled = true;
-            try {
-                const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${key}` } });
-                alert(res.ok ? '✅ API Key valid!' : '❌ Invalid key');
-            } catch(e) { alert('❌ Error: ' + e.message); }
             btn.textContent = '🧪 Test Connection';
             btn.disabled = false;
         }
@@ -502,9 +457,8 @@ Join us next week as we interview a creator who grew to 100k followers using onl
                         <button class="modal-close" onclick="closeModal()">✕</button>
                         <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">${f.title}</h2>
                         <p style="color: #666; margin-bottom: 1rem;">${f.description}</p>
-                        ${AI_PROVIDER === 'demo' ? '<div class="api-section" style="background: #d4edda;"><strong>📋 Demo Mode Active</strong><br>Showing sample output. No AI used.</div>' : ''}
-                        ${AI_PROVIDER === 'groq' && !GROQ_API_KEY ? '<div class="api-section"><strong>⚡ Using Groq Free Tier</strong><br>Works without API key! Or add your own for higher limits.</div>' : ''}
-                        ${AI_PROVIDER === 'openai' && !OPENAI_API_KEY ? '<div class="api-section" style="background: #f8d7da;"><strong>⚠️ OpenAI API Key needed</strong><br>Go to Settings → API to add your key.</div>' : ''}
+                        ${AI_PROVIDER === 'demo' ? '<div class="api-section" style="background: #d4edda;"><strong>📋 Demo Mode Active</strong><br>Showing sample output. Add API key for AI generation.</div>' : ''}
+                        ${AI_PROVIDER === 'groq' && !GROQ_API_KEY ? '<div class="api-section"><strong>⚡ Demo Mode (No API Key)</strong><br>Get free key at console.groq.com or use Demo Mode.</div>' : ''}
                         <textarea id="input" class="input-area" placeholder="${f.placeholder}"></textarea>
                         <button onclick="generate('${name}')" id="gen-btn" class="btn" style="width: 100%;">✨ Generate</button>
                         <div id="result" class="result-box">
@@ -532,8 +486,8 @@ Join us next week as we interview a creator who grew to 100k followers using onl
             btn.disabled = true;
             errorBox.classList.add('hidden');
 
-            // DEMO MODE: Return sample output immediately
-            if (AI_PROVIDER === 'demo') {
+            // Demo mode: show sample output
+            if (AI_PROVIDER === 'demo' || !GROQ_API_KEY) {
                 setTimeout(() => {
                     document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output for ' + name;
                     document.getElementById('result').classList.add('show');
@@ -545,54 +499,27 @@ Join us next week as we interview a creator who grew to 100k followers using onl
             }
 
             try {
-                let res, data;
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${GROQ_API_KEY}` 
+                    },
+                    body: JSON.stringify({ 
+                        model: GROQ_MODEL, 
+                        messages: [
+                            { role: 'system', content: f.system }, 
+                            { role: 'user', content: f.prefix + input }
+                        ], 
+                        temperature: 0.7, 
+                        max_tokens: 2000 
+                    })
+                });
 
-                if (AI_PROVIDER === 'groq') {
-                    // Try Groq API
-                    const key = GROQ_API_KEY || 'gsk_demo'; // Demo key if none provided
-                    res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json', 
-                            'Authorization': `Bearer ${key}` 
-                        },
-                        body: JSON.stringify({ 
-                            model: GROQ_MODEL, 
-                            messages: [
-                                { role: 'system', content: f.system }, 
-                                { role: 'user', content: f.prefix + input }
-                            ], 
-                            temperature: 0.7, 
-                            max_tokens: 2000 
-                        })
-                    });
-                    data = await res.json();
+                const data = await res.json();
 
-                    // If Groq fails (quota/rate limit), fallback to demo
-                    if (!res.ok || data.error) {
-                        throw new Error(data.error?.message || 'Groq API error');
-                    }
-                } else {
-                    // OpenAI API
-                    if (!OPENAI_API_KEY) throw new Error('No OpenAI API key configured');
-                    res = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json', 
-                            'Authorization': `Bearer ${OPENAI_API_KEY}` 
-                        },
-                        body: JSON.stringify({ 
-                            model: OPENAI_MODEL, 
-                            messages: [
-                                { role: 'system', content: f.system }, 
-                                { role: 'user', content: f.prefix + input }
-                            ], 
-                            temperature: 0.7, 
-                            max_tokens: 2000 
-                        })
-                    });
-                    data = await res.json();
-                    if (!res.ok) throw new Error(data.error?.message || 'OpenAI API error');
+                if (!res.ok || data.error) {
+                    throw new Error(data.error?.message || 'API error');
                 }
 
                 document.getElementById('content').textContent = data.choices[0].message.content;
@@ -601,8 +528,8 @@ Join us next week as we interview a creator who grew to 100k followers using onl
 
             } catch(e) {
                 console.error('API Error:', e);
-                // Fallback to demo mode on any error
-                errorBox.innerHTML = `<strong>⚠️ ${e.message}</strong><br>Showing demo output instead. <a href="#" onclick="showSettings(); return false;">Configure API settings</a>`;
+                // Show demo output on any error
+                errorBox.innerHTML = `<strong>⚠️ ${e.message}</strong><br>Showing demo output instead.`;
                 errorBox.classList.remove('hidden');
                 document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
                 document.getElementById('result').classList.add('show');
@@ -612,18 +539,9 @@ Join us next week as we interview a creator who grew to 100k followers using onl
             btn.disabled = false;
         }
 
-        function regenerate(name) {
-            generate(name);
-        }
-
-        function copy() { 
-            navigator.clipboard.writeText(document.getElementById('content').textContent).then(() => alert('Copied!')); 
-        }
-
-        function updateStats() { 
-            localStorage.setItem('repurposes_used', (parseInt(localStorage.getItem('repurposes_used') || 0) + 1)); 
-            loadStats(); 
-        }
+        function regenerate(name) { generate(name); }
+        function copy() { navigator.clipboard.writeText(document.getElementById('content').textContent).then(() => alert('Copied!')); }
+        function updateStats() { localStorage.setItem('repurposes_used', (parseInt(localStorage.getItem('repurposes_used') || 0) + 1)); loadStats(); }
     </script>
 </body>
 </html>
