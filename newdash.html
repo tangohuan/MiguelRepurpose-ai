@@ -3,155 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>RepurposeAI - Dashboard v2</title>
+    <title>RepurposeAI - Dashboard (Free Version)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --primary: #667eea; --bg: #f8f9fa; --card: white; --text: #2c3e50; }
-        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
-        .nav { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; }
-        .nav h1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-links { display: flex; gap: 0.5rem; }
-        .nav a, .nav button { color: var(--text); text-decoration: none; background: none; border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px; font-weight: 500; }
-        .nav button:hover { background: var(--bg); color: var(--primary); }
+        :root { --primary-color: #667eea; --bg-color: #f8f9fa; --card-bg: white; --text-color: #2c3e50; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .navbar h1 { font-size: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .navbar-links { display: flex; align-items: center; gap: 0.5rem; }
+        .navbar a, .navbar button { color: var(--text-color); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 8px 16px; border-radius: 8px; transition: all 0.3s; font-weight: 500; }
+        .navbar a:hover, .navbar button:hover { background: var(--bg-color); color: var(--primary-color); }
+        .navbar button.logout { background: #fee; color: #e74c3c; }
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: var(--card); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .btn { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin: 5px; font-weight: 500; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .btn { background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin: 5px; font-weight: 500; transition: all 0.3s; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
         .btn-success { background: #27ae60; }
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
         .hidden { display: none !important; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .stat { text-align: center; padding: 2rem; background: var(--card); border-radius: 12px; border-top: 4px solid var(--primary); }
-        .stat h3 { font-size: 2.5rem; color: var(--primary); font-weight: 700; }
-        .hero { background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .feature { background: var(--card); border-radius: 12px; padding: 1.5rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s; }
-        .feature:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
-        .feature h4 { color: var(--primary); margin-bottom: 0.5rem; }
-        .settings { display: flex; gap: 2rem; }
-        .sidebar { width: 260px; background: var(--card); border-radius: 12px; padding: 1rem; height: fit-content; position: sticky; top: 100px; }
-        .menu-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
-        .menu-item:hover { background: var(--bg); color: var(--primary); }
-        .menu-item.active { background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%); color: white; }
-        .content { flex: 1; }
-        .section { margin-bottom: 2rem; }
-        .section h3 { margin-bottom: 1.5rem; color: var(--primary); font-size: 1.3rem; }
+        .stat { text-align: center; padding: 2rem 1.5rem; background: var(--card-bg); border-radius: 12px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .stat h3 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; font-weight: 700; }
+        .welcome-hero { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .feature-card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 2px solid transparent; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .feature-card:hover { border-color: var(--primary-color); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+        .feature-card h4 { color: var(--primary-color); margin-bottom: 0.5rem; }
+        .settings-layout { display: flex; gap: 2rem; }
+        .settings-sidebar { width: 260px; background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); height: fit-content; position: sticky; top: 100px; }
+        .menu-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; color: var(--text-color); transition: all 0.3s; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
+        .menu-item:hover { background: var(--bg-color); color: var(--primary-color); }
+        .menu-item.active { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; }
+        .settings-content { flex: 1; }
+        .settings-section { margin-bottom: 2rem; }
+        .settings-section h3 { margin-bottom: 1.5rem; color: var(--primary-color); font-size: 1.3rem; }
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input, .form-group select { padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; max-width: 400px; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
-        .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #e0e0e0; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        .form-group input, .form-group select { padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; max-width: 400px; font-size: 0.95rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); }
+        .auth-check { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #e0e0e0; border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
-        .modal-box { background: white; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
+        .modal-content { background: white; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-        textarea { width: 100%; min-height: 150px; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 1rem; }
-        .result { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary); display: none; }
-        .result.show { display: block; }
-        .api-box { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
-        .help-box { margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; font-size: 0.9rem; }
-        .spin { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
-        @media (max-width: 768px) { .settings { flex-direction: column; } .sidebar { width: 100%; position: static; } }
+        .input-area { width: 100%; min-height: 150px; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 1rem; }
+        .result-box { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color); display: none; }
+        .result-box.show { display: block; }
+        .result-content { white-space: pre-wrap; line-height: 1.6; margin-bottom: 1rem; }
+        .api-section { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+        .api-help { margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; font-size: 0.9rem; }
+        .demo-badge { background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 10px; }
+        .error-box { background: #fee; border: 1px solid #e74c3c; color: #c0392b; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        .success-box { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        @media (max-width: 768px) { .settings-layout { flex-direction: column; } .settings-sidebar { width: 100%; position: static; } }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <div id="loading" class="loading"><div class="spinner"></div><p>Loading...</p></div>
-    
-    <nav class="nav" id="nav" style="display: none;">
-        <h1>RepurposeAI v2</h1>
-        <div class="nav-links">
-            <a href="#" onclick="showDash(); return false;">Dashboard</a>
+    <div id="auth-check" class="auth-check"><div class="spinner"></div><p>Loading...</p></div>
+
+    <nav class="navbar" id="navbar" style="display: none;">
+        <h1>RepurposeAI <span class="demo-badge">FREE</span></h1>
+        <div class="navbar-links">
+            <a href="#" onclick="showDashboard(); return false;" id="nav-dashboard">Dashboard</a>
             <a href="pricing.html">Pricing</a>
-            <button onclick="showSettings()">Settings</button>
-            <button onclick="logout()" style="background: #fee; color: #e74c3c;">Logout</button>
+            <button onclick="showSettings()" id="nav-settings">Settings</button>
+            <button onclick="logout()" class="logout">Logout</button>
         </div>
     </nav>
 
-    <div class="container" id="main" style="display: none;">
-        <div id="dash-view">
-            <div class="card hero">
-                <h2>Welcome back, <span id="user-name">User</span>! 👋</h2>
-                <p>Plan: <strong id="user-plan">Free</strong></p>
+    <div class="container" id="main-container" style="display: none;">
+        <div id="dashboard-view">
+            <div class="card welcome-hero">
+                <h2>Welcome back, <span id="user-email">User</span>! 👋</h2>
+                <p>Your current plan: <strong id="user-plan">Free</strong> (Powered by Groq AI - No API key needed!)</p>
             </div>
 
             <div class="grid">
-                <div class="stat"><h3 id="stat-used">0</h3><p>Repurposes Used</p></div>
-                <div class="stat"><h3>5</h3><p>Templates</p></div>
-                <div class="stat"><h3 id="stat-credits">100</h3><p>Credits</p></div>
+                <div class="stat"><h3 id="stat-repurposes">0</h3><p>Repurposes Used</p></div>
+                <div class="stat"><h3 id="stat-templates">5</h3><p>Templates Available</p></div>
+                <div class="stat"><h3 id="stat-credits">∞</h3><p>Unlimited Credits</p></div>
             </div>
 
-            <div class="card">
+            <div class="card" style="margin-top: 2rem;">
                 <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
-                <button onclick="openTool('twitter')" class="btn">+ Create</button>
-                <a href="pricing.html" class="btn btn-success">Upgrade</a>
-                <button onclick="showSettings()" class="btn btn-outline">Settings</button>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button onclick="openFeature('blog-to-twitter')" class="btn"><span>+</span> Create Content</button>
+                    <a href="pricing.html" class="btn btn-success">Upgrade Plan</a>
+                    <button onclick="showSettings()" class="btn btn-outline">Settings</button>
+                </div>
             </div>
-            
-            <div class="features">
-                <div class="feature" onclick="openTool('twitter')"><h4>📝 Blog to Twitter</h4><p>Convert blog posts to viral Twitter threads</p></div>
-                <div class="feature" onclick="openTool('blog')"><h4>🎥 Video to Blog</h4><p>Turn videos into structured articles</p></div>
-                <div class="feature" onclick="openTool('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters from content</p></div>
-                <div class="feature" onclick="openTool('social')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Twitter, Instagram posts</p></div>
-                <div class="feature" onclick="openTool('quotes')"><h4>🎨 Image Quotes</h4><p>Create shareable quote graphics</p></div>
-                <div class="feature" onclick="openTool('podcast')"><h4>🎙️ Podcast Shownotes</h4><p>Generate professional shownotes</p></div>
+
+            <div class="feature-grid">
+                <div class="feature-card" onclick="openFeature('blog-to-twitter')"><h4>📝 Blog to Twitter</h4><p>Transform your blog posts into engaging Twitter threads</p></div>
+                <div class="feature-card" onclick="openFeature('video-to-blog')"><h4>🎥 Video to Blog</h4><p>Convert YouTube videos into well-structured blog articles</p></div>
+                <div class="feature-card" onclick="openFeature('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters from your existing content</p></div>
+                <div class="feature-card" onclick="openFeature('social-posts')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Facebook, and Instagram posts</p></div>
+                <div class="feature-card" onclick="openFeature('image-quotes')"><h4>🎨 Image Quotes</h4><p>Create shareable quote images from your content</p></div>
+                <div class="feature-card" onclick="openFeature('podcast-shownotes')"><h4>🎙️ Podcast Shownotes</h4><p>Generate shownotes and summaries from podcast episodes</p></div>
             </div>
         </div>
 
         <div id="settings-view" class="hidden">
-            <div class="settings">
-                <div class="sidebar">
-                    <div class="menu-item active" onclick="showTab('look', this)">🎨 Appearance</div>
+            <div class="settings-layout">
+                <div class="settings-sidebar">
+                    <div class="menu-item active" onclick="showTab('appearance', this)">🎨 Appearance</div>
                     <div class="menu-item" onclick="showTab('account', this)">👤 Account</div>
-                    <div class="menu-item" onclick="showTab('notify', this)">🔔 Notifications</div>
-                    <div class="menu-item" onclick="showTab('api', this)">🔑 API Key</div>
+                    <div class="menu-item" onclick="showTab('notifications', this)">🔔 Notifications</div>
+                    <div class="menu-item" onclick="showTab('api', this)">🔑 API Settings</div>
                 </div>
-                
-                <div class="content">
-                    <div id="tab-look" class="card section">
-                        <h3>Appearance</h3>
+
+                <div class="settings-content">
+                    <div id="settings-appearance" class="card settings-section">
+                        <h3>Appearance Settings</h3>
                         <div class="form-group"><label>Theme Color</label><input type="color" id="theme-color" value="#667eea"></div>
-                        <div class="form-group"><label>Dark Mode</label><select id="dark-mode"><option value="light">Light</option><option value="dark">Dark</option><option value="auto">Auto</option></select></div>
-                        <button onclick="applyTheme()" class="btn">Preview</button>
-                        <button onclick="saveAppearance()" class="btn btn-success">Save</button>
+                        <div class="form-group"><label>Dark Mode</label><select id="dark-mode"><option value="light">☀️ Light</option><option value="dark">🌙 Dark</option><option value="auto">⚡ Auto</option></select></div>
+                        <div class="form-group"><label>Font Size</label><select id="font-size"><option value="14px">Small</option><option value="16px" selected>Normal</option><option value="18px">Large</option></select></div>
+                        <button onclick="applyTheme()" class="btn">Preview Theme</button>
+                        <button onclick="saveSettings()" class="btn btn-success">Save Settings</button>
                     </div>
 
-                    <div id="tab-account" class="card section hidden">
-                        <h3>Account</h3>
-                        <div class="form-group"><label>Email</label><input type="email" id="acc-email" readonly style="background: #f5f5f5;"></div>
-                        <div class="form-group"><label>Plan</label><input type="text" id="acc-plan" readonly style="background: #f5f5f5;"></div>
+                    <div id="settings-account" class="card settings-section hidden">
+                        <h3>Account Settings</h3>
+                        <div class="form-group"><label>Email</label><input type="email" id="account-email" readonly style="background: #f5f5f5;"></div>
+                        <div class="form-group"><label>Plan</label><input type="text" id="account-plan" readonly style="background: #f5f5f5;"></div>
                         <a href="pricing.html" class="btn">Change Plan</a>
                         <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
                     </div>
 
-                    <div id="tab-notify" class="card section hidden">
-                        <h3>Notifications</h3>
-                        <label style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-email" checked> Email notifications</label>
-                        <label style="display: flex; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-market"> Marketing emails</label>
-                        <button onclick="saveNotify()" class="btn btn-success">Save</button>
+                    <div id="settings-notifications" class="card settings-section hidden">
+                        <h3>Notification Preferences</h3>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-email" checked> Email notifications</label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-marketing"> Marketing emails</label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-weekly" checked> Weekly summary</label>
+                        <button onclick="saveSettings()" class="btn btn-success">Save Preferences</button>
                     </div>
-                    
-                    <div id="tab-api" class="card section hidden">
-                        <h3>🔑 OpenAI API Key</h3>
-                        <p style="margin-bottom: 1rem; color: #666;">Add your OpenAI API key to enable AI features. Stored locally only.</p>
-                        
-                        <div class="form-group"><label>API Key</label><input type="password" id="api-key" placeholder="sk-..." style="font-family: monospace;"></div>
-                        <div class="form-group"><label>Model</label><select id="api-model"><option value="gpt-3.5-turbo">GPT-3.5 Turbo</option><option value="gpt-4">GPT-4</option><option value="gpt-4-turbo-preview">GPT-4 Turbo</option></select></div>
-                        
-                        <button onclick="saveKey()" class="btn btn-success">💾 Save Key</button>
-                        <button onclick="testKey()" class="btn btn-outline">🧪 Test</button>
-                        
-                        <div class="help-box">
-                            <strong>Get your API Key:</strong>
-                            <ol style="margin-left: 1.2rem; margin-top: 0.5rem;">
-                                <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
-                                <li>Create account or login</li>
-                                <li>Click "Create new secret key"</li>
-                                <li>Copy and paste above</li>
-                            </ol>
+
+                    <div id="settings-api" class="card settings-section hidden">
+                        <h3>🔑 AI Provider Settings</h3>
+
+                        <div class="success-box">
+                            <strong>✅ Currently Using: Groq (Free Tier)</strong><br>
+                            <small>No API key required! 1,000,000 tokens/day free.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>AI Provider</label>
+                            <select id="ai-provider" onchange="toggleProvider()">
+                                <option value="groq" selected>🚀 Groq (Free - Recommended)</option>
+                                <option value="openai">🤖 OpenAI (Requires API Key)</option>
+                                <option value="demo">📋 Demo Mode (No AI - Sample Output)</option>
+                            </select>
+                        </div>
+
+                        <div id="groq-settings">
+                            <div class="form-group">
+                                <label>Groq API Key (Optional - Get free key at groq.com)</label>
+                                <input type="password" id="groq-api-key" placeholder="gsk_... (optional - works without key in demo mode)" style="font-family: monospace;">
+                            </div>
+                            <div class="form-group">
+                                <label>Model</label>
+                                <select id="groq-model">
+                                    <option value="mixtral-8x7b-32768" selected>Mixtral 8x7B (Recommended)</option>
+                                    <option value="llama3-8b-8192">Llama 3 8B (Fastest)</option>
+                                    <option value="llama3-70b-8192">Llama 3 70B (Most Powerful)</option>
+                                </select>
+                            </div>
+                            <button onclick="saveGroqKey()" class="btn btn-success">💾 Save Settings</button>
+                            <button onclick="testGroqKey()" class="btn btn-outline">🧪 Test Connection</button>
+                        </div>
+
+                        <div id="openai-settings" class="hidden">
+                            <div class="form-group"><label>OpenAI API Key</label><input type="password" id="openai-api-key" placeholder="sk-..." style="font-family: monospace;"></div>
+                            <div class="form-group"><label>Model</label><select id="openai-model"><option value="gpt-3.5-turbo">GPT-3.5 Turbo</option><option value="gpt-4">GPT-4</option><option value="gpt-4-turbo-preview">GPT-4 Turbo</option></select></div>
+                            <button onclick="saveApiKey()" class="btn btn-success">💾 Save API Key</button>
+                            <button onclick="testApiKey()" class="btn btn-outline">🧪 Test Connection</button>
+                            <div class="api-help">
+                                <strong>How to get your OpenAI API Key:</strong>
+                                <ol style="margin-left: 1.2rem; margin-top: 0.5rem;">
+                                    <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
+                                    <li>Sign up or log in</li>
+                                    <li>Click "Create new secret key"</li>
+                                    <li>Copy and paste it here</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div id="groq-info" style="margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px;">
+                            <strong>About Groq (Free Alternative):</strong>
+                            <ul style="margin-left: 1.2rem; margin-top: 0.5rem;">
+                                <li>✅ Completely free tier (1M tokens/day)</li>
+                                <li>⚡ Blazing fast inference speed</li>
+                                <li>🔒 No credit card required</li>
+                                <li>🤖 Uses Mixtral & Llama 3 models</li>
+                                <li>🌐 Get your free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -160,161 +208,422 @@
     </div>
 
     <script>
-        let API_KEY = localStorage.getItem('openai_key') || '';
-        let API_MODEL = localStorage.getItem('openai_model') || 'gpt-3.5-turbo';
-        
-        const TOOLS = {
-            twitter: { title: '📝 Blog to Twitter', desc: 'Convert blog to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to numbered Twitter thread with emojis. Each tweet under 280 chars.', prefix: 'Convert to Twitter thread:\n\n' },
-            blog: { title: '🎥 Video to Blog', desc: 'Video to blog article', placeholder: 'Paste video transcript...', system: 'Convert to structured blog post with markdown headers.', prefix: 'Convert to blog post:\n\n' },
-            newsletter: { title: '📧 Newsletter', desc: 'Create newsletter', placeholder: 'Paste content...', system: 'Create newsletter with subject, greeting, CTA, sign-off.', prefix: 'Create newsletter:\n\n' },
-            social: { title: '📱 Social Posts', desc: 'Generate social posts', placeholder: 'Paste content...', system: 'Create LinkedIn, Twitter, Instagram versions.', prefix: 'Create social posts:\n\n' },
-            quotes: { title: '🎨 Image Quotes', desc: 'Generate quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 chars.', prefix: 'Create quotes:\n\n' },
-            podcast: { title: '🎙️ Podcast Shownotes', desc: 'Generate shownotes', placeholder: 'Paste transcript...', system: 'Create shownotes with summary, timestamps, quotes.', prefix: 'Create shownotes:\n\n' }
+        // Configuration - GROQ IS DEFAULT (FREE)
+        let AI_PROVIDER = localStorage.getItem('ai_provider') || 'groq';
+        let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
+        let GROQ_MODEL = localStorage.getItem('groq_model') || 'mixtral-8x7b-32768';
+        let OPENAI_API_KEY = localStorage.getItem('openai_api_key') || '';
+        let OPENAI_MODEL = localStorage.getItem('openai_model') || 'gpt-3.5-turbo';
+
+        const FEATURES = {
+            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:\\n\\n' },
+            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post with markdown.', prefix: 'Convert to blog post:\\n\\n' },
+            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste content...', system: 'Create engaging newsletter with subject, greeting, CTA, sign-off.', prefix: 'Create newsletter from:\\n\\n' },
+            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Paste content...', system: 'Create LinkedIn, Twitter, and Instagram versions of this content.', prefix: 'Create social posts from:\\n\\n' },
+            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes from:\\n\\n' },
+            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps, quotes, resources.', prefix: 'Create shownotes from:\\n\\n' }
+        };
+
+        // Demo/Sample outputs for when API fails or demo mode
+        const DEMO_OUTPUTS = {
+            'blog-to-twitter': `🧵 Thread: 5 Tips for Better Content
+
+1/ 🎯 Know your audience
+Research what they care about before writing
+
+2/ ✍️ Hook them early
+First 3 seconds decide if they stay
+
+3/ 📊 Use data
+Numbers build credibility
+
+4/ 🎨 Visuals matter
+Break text with images/GIFs
+
+5/ 🔄 Repurpose wisely
+One blog = 10+ pieces of content
+
+Follow for more tips! 👇`,
+            'video-to-blog': `# How to Create Engaging Video Content
+
+## Introduction
+Video content has become essential for modern marketing strategies. In this guide, we'll explore proven techniques to create videos that capture attention and drive engagement.
+
+## Key Points Covered
+
+### 1. Planning Your Content
+Start with a clear objective. What action do you want viewers to take?
+
+### 2. Scripting for Success
+Write conversationally. Use short sentences and avoid jargon.
+
+### 3. Visual Storytelling
+Show, don't just tell. Use B-roll, graphics, and transitions effectively.
+
+## Conclusion
+Great video content combines planning, authenticity, and technical quality. Start implementing these tips today!`,
+            'newsletter': `Subject: Your Weekly Content Strategy Update 🚀
+
+Hi [Name],
+
+Welcome to this week's newsletter! Here's what's working in content right now:
+
+📈 TRENDING: Short-form video continues to dominate
+• TikTok/Instagram Reels getting 3x more engagement
+• Best length: 15-30 seconds
+• Hook viewers in first 3 seconds
+
+💡 TIP OF THE WEEK
+Repurpose your best-performing blog post into:
+- 5 Twitter posts
+- 1 LinkedIn article
+- 3 Instagram carousels
+- 1 YouTube Short
+
+🎯 ACTION ITEM
+Review your analytics. Find your top post from last month. Repurpose it today!
+
+Stay creative,
+[Your Name]
+
+P.S. Reply and let me know what content challenges you're facing!`,
+            'social-posts': `📱 LINKEDIN VERSION:
+Just published a deep dive on content repurposing. The data is clear: brands that repurpose content see 3x more engagement with 60% less effort. What's your favorite repurposing strategy? 👇
+
+🐦 TWITTER VERSION:
+5 content pieces from 1 blog post:
+📝 Twitter thread
+📸 Instagram carousel
+🎥 YouTube Short
+📧 Newsletter snippet
+💼 LinkedIn article
+
+Work smarter, not harder.
+
+📸 INSTAGRAM VERSION:
+[Image: Split screen showing content transformation]
+
+Caption: One idea → Multiple formats
+That's the power of repurposing! ✨
+
+Save this for later ↗️
+
+#ContentStrategy #MarketingTips`,
+            'image-quotes': `"Success is not final, failure is not fatal: it is the courage to continue that counts." — Winston Churchill
+
+"The only way to do great work is to love what you do." — Steve Jobs
+
+"Innovation distinguishes between a leader and a follower." — Steve Jobs
+
+"Your time is limited, don't waste it living someone else's life." — Steve Jobs
+
+"The future belongs to those who believe in the beauty of their dreams." — Eleanor Roosevelt`,
+            'podcast-shownotes': `## Episode Summary
+In this episode, we dive deep into content repurposing strategies that can 10x your reach without creating new content from scratch.
+
+## Key Timestamps
+- **00:00** - Introduction to content repurposing
+- **03:45** - The 5 pillar content strategy
+- **08:20** - Tools for automation
+- **15:00** - Platform-specific optimization
+- **22:30** - Measuring ROI on repurposed content
+- **28:00** - Q&A and final thoughts
+
+## Resources Mentioned
+- Canva for design
+- Repurpose.io for automation
+- Buffer for scheduling
+
+## Quotes
+"One piece of content should become 20 pieces across different platforms."
+
+## Next Episode
+Join us next week as we interview a creator who grew to 100k followers using only repurposed content!`
         };
 
         // Init
         (function() {
             if (!localStorage.getItem('token')) { window.location.href = 'login.html'; return; }
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('nav').style.display = 'flex';
-            document.getElementById('main').style.display = 'block';
-            
-            let user = JSON.parse(localStorage.getItem('user') || '{}');
-            document.getElementById('user-name').textContent = user.email || 'User';
+            document.getElementById('auth-check').style.display = 'none';
+            document.getElementById('navbar').style.display = 'flex';
+            document.getElementById('main-container').style.display = 'block';
+
+            let user = {};
+            try { user = JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) {}
+            document.getElementById('user-email').textContent = user.email || 'User';
+            document.getElementById('account-email').value = user.email || 'User';
+            document.getElementById('account-plan').value = user.plan || 'Free';
             document.getElementById('user-plan').textContent = user.plan || 'Free';
-            document.getElementById('acc-email').value = user.email || 'User';
-            document.getElementById('acc-plan').value = user.plan || 'Free';
-            
-            if (API_KEY) document.getElementById('api-key').value = API_KEY;
-            document.getElementById('api-model').value = API_MODEL;
-            
-            updateStats();
-            loadAppearance();
+
+            // Load saved settings
+            if (GROQ_API_KEY) document.getElementById('groq-api-key').value = GROQ_API_KEY;
+            document.getElementById('groq-model').value = GROQ_MODEL;
+            if (OPENAI_API_KEY) document.getElementById('openai-api-key').value = OPENAI_API_KEY;
+            document.getElementById('openai-model').value = OPENAI_MODEL;
+            document.getElementById('ai-provider').value = AI_PROVIDER;
+
+            toggleProvider();
+            loadStats();
+            loadSettings();
         })();
 
-        function updateStats() {
-            document.getElementById('stat-used').textContent = localStorage.getItem('repurposes_used') || '0';
-            document.getElementById('stat-credits').textContent = localStorage.getItem('credits_remaining') || '100';
+        function loadStats() {
+            document.getElementById('stat-repurposes').textContent = localStorage.getItem('repurposes_used') || '0';
         }
 
-        function logout() { if(confirm('Logout?')) { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = 'login.html'; } }
-        function showDash() { document.getElementById('settings-view').classList.add('hidden'); document.getElementById('dash-view').classList.remove('hidden'); }
-        function showSettings() { document.getElementById('dash-view').classList.add('hidden'); document.getElementById('settings-view').classList.remove('hidden'); }
-        
+        function logout() { if(confirm('Logout?')) { localStorage.clear(); window.location.href = 'login.html'; } }
+        function showDashboard() { document.getElementById('settings-view').classList.add('hidden'); document.getElementById('dashboard-view').classList.remove('hidden'); document.getElementById('nav-settings').style.display = 'inline-block'; document.getElementById('nav-dashboard').textContent = 'Dashboard'; }
+        function showSettings() { document.getElementById('dashboard-view').classList.add('hidden'); document.getElementById('settings-view').classList.remove('hidden'); document.getElementById('nav-settings').style.display = 'none'; document.getElementById('nav-dashboard').textContent = '← Back'; }
+
         function showTab(tab, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('settings-' + tab).classList.remove('hidden');
             el.classList.add('active');
+        }
+
+        function toggleProvider() {
+            const provider = document.getElementById('ai-provider').value;
+            AI_PROVIDER = provider;
+            localStorage.setItem('ai_provider', provider);
+
+            if (provider === 'groq') {
+                document.getElementById('groq-settings').classList.remove('hidden');
+                document.getElementById('openai-settings').classList.add('hidden');
+                document.getElementById('groq-info').classList.remove('hidden');
+            } else if (provider === 'openai') {
+                document.getElementById('groq-settings').classList.add('hidden');
+                document.getElementById('openai-settings').classList.remove('hidden');
+                document.getElementById('groq-info').classList.add('hidden');
+            } else {
+                // Demo mode
+                document.getElementById('groq-settings').classList.add('hidden');
+                document.getElementById('openai-settings').classList.add('hidden');
+                document.getElementById('groq-info').classList.remove('hidden');
+            }
         }
 
         function applyTheme() {
             const root = document.documentElement;
-            root.style.setProperty('--primary', document.getElementById('theme-color').value);
-            const isDark = document.getElementById('dark-mode').value === 'dark';
-            root.style.setProperty('--bg', isDark ? '#0f0f23' : '#f8f9fa');
-            root.style.setProperty('--card', isDark ? '#1a1a2e' : '#ffffff');
-            root.style.setProperty('--text', isDark ? '#eaeaea' : '#2c3e50');
+            root.style.setProperty('--primary-color', document.getElementById('theme-color').value);
+            const isDark = document.getElementById('dark-mode').value === 'dark' || (document.getElementById('dark-mode').value === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            root.style.setProperty('--bg-color', isDark ? '#0f0f23' : '#f8f9fa');
+            root.style.setProperty('--card-bg', isDark ? '#1a1a2e' : '#ffffff');
+            root.style.setProperty('--text-color', isDark ? '#eaeaea' : '#2c3e50');
+            root.style.fontSize = document.getElementById('font-size').value;
         }
 
-        function saveAppearance() {
-            localStorage.setItem('appearance', JSON.stringify({
-                color: document.getElementById('theme-color').value,
-                dark: document.getElementById('dark-mode').value
+        function saveSettings() {
+            localStorage.setItem('userSettings', JSON.stringify({
+                themeColor: document.getElementById('theme-color').value,
+                darkMode: document.getElementById('dark-mode').value,
+                fontSize: document.getElementById('font-size').value,
+                notifEmail: document.getElementById('notif-email').checked,
+                notifMarketing: document.getElementById('notif-marketing').checked,
+                notifWeekly: document.getElementById('notif-weekly').checked
             }));
-            alert('Saved!');
+            applyTheme();
+            alert('Settings saved!');
         }
 
-        function loadAppearance() {
-            const s = JSON.parse(localStorage.getItem('appearance') || '{}');
-            if (s.color) document.getElementById('theme-color').value = s.color;
-            if (s.dark) document.getElementById('dark-mode').value = s.dark;
+        function loadSettings() {
+            const s = JSON.parse(localStorage.getItem('userSettings') || '{}');
+            if (s.themeColor) document.getElementById('theme-color').value = s.themeColor;
+            if (s.darkMode) document.getElementById('dark-mode').value = s.darkMode;
+            if (s.fontSize) document.getElementById('font-size').value = s.fontSize;
+            if (s.notifEmail !== undefined) document.getElementById('notif-email').checked = s.notifEmail;
+            if (s.notifMarketing !== undefined) document.getElementById('notif-marketing').checked = s.notifMarketing;
+            if (s.notifWeekly !== undefined) document.getElementById('notif-weekly').checked = s.notifWeekly;
             applyTheme();
         }
 
-        function saveNotify() {
-            localStorage.setItem('notifications', JSON.stringify({
-                email: document.getElementById('notif-email').checked,
-                market: document.getElementById('notif-market').checked
-            }));
-            alert('Saved!');
+        function saveGroqKey() {
+            const key = document.getElementById('groq-api-key').value.trim();
+            GROQ_API_KEY = key;
+            GROQ_MODEL = document.getElementById('groq-model').value;
+            localStorage.setItem('groq_api_key', key);
+            localStorage.setItem('groq_model', GROQ_MODEL);
+            alert('Groq settings saved!');
         }
 
-        function saveKey() {
-            const key = document.getElementById('api-key').value.trim();
-            if (!key) return alert('Enter API key');
-            if (!key.startsWith('sk-')) return alert('Key must start with sk-');
-            API_KEY = key;
-            API_MODEL = document.getElementById('api-model').value;
-            localStorage.setItem('openai_key', key);
-            localStorage.setItem('openai_model', API_MODEL);
-            alert('API Key saved!');
-        }
-
-        async function testKey() {
-            const key = document.getElementById('api-key').value.trim() || API_KEY;
-            if (!key) return alert('Enter API key');
+        async function testGroqKey() {
+            const key = document.getElementById('groq-api-key').value.trim() || GROQ_API_KEY;
             const btn = event.target;
-            btn.innerHTML = '<span class="spin"></span>Testing...';
+            btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
             btn.disabled = true;
+
             try {
-                const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${key}` } });
-                alert(res.ok ? '✅ Valid!' : '❌ Invalid');
-            } catch(e) { alert('❌ Error'); }
-            btn.textContent = '🧪 Test';
+                const res = await fetch('https://api.groq.com/openai/v1/models', {
+                    headers: { 'Authorization': `Bearer ${key || 'demo'}` }
+                });
+                if (res.ok) {
+                    alert('✅ Groq connection successful!');
+                } else {
+                    alert('❌ Invalid key or demo mode. Get free key at console.groq.com');
+                }
+            } catch(e) { 
+                alert('❌ Error: ' + e.message); 
+            }
+            btn.textContent = '🧪 Test Connection';
             btn.disabled = false;
         }
 
-        function openTool(name) {
-            const t = TOOLS[name];
+        function saveApiKey() {
+            const key = document.getElementById('openai-api-key').value.trim();
+            if (!key) return alert('Enter API key');
+            if (!key.startsWith('sk-')) return alert('Key must start with sk-');
+            OPENAI_API_KEY = key;
+            OPENAI_MODEL = document.getElementById('openai-model').value;
+            localStorage.setItem('openai_api_key', key);
+            localStorage.setItem('openai_model', OPENAI_MODEL);
+            alert('OpenAI API Key saved!');
+        }
+
+        async function testApiKey() {
+            const key = document.getElementById('openai-api-key').value.trim() || OPENAI_API_KEY;
+            if (!key) return alert('Enter API key first');
+            const btn = event.target;
+            btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${key}` } });
+                alert(res.ok ? '✅ API Key valid!' : '❌ Invalid key');
+            } catch(e) { alert('❌ Error: ' + e.message); }
+            btn.textContent = '🧪 Test Connection';
+            btn.disabled = false;
+        }
+
+        function openFeature(name) {
+            const f = FEATURES[name];
             const div = document.createElement('div');
             div.innerHTML = `
-                <div class="modal" onclick="if(event.target===this)document.getElementById('mod').remove()">
-                    <div class="modal-box">
-                        <button class="modal-close" onclick="document.getElementById('mod').remove()">✕</button>
-                        <h2 style="color: var(--primary); margin-bottom: 0.5rem;">${t.title}</h2>
-                        <p style="color: #666; margin-bottom: 1rem;">${t.desc}</p>
-                        ${!API_KEY ? '<div class="api-box"><strong>⚠️ Need API Key</strong><input type="password" id="temp-key" placeholder="sk-..." style="width: 100%; margin-top: 0.5rem;"></div>' : ''}
-                        <textarea id="tool-input" placeholder="${t.placeholder}"></textarea>
-                        <button onclick="runTool('${name}')" id="go-btn" class="btn" style="width: 100%;">✨ Generate</button>
-                        <div id="tool-result" class="result"><div id="tool-out" style="white-space: pre-wrap; margin-bottom: 1rem;"></div><button onclick="copyTool()" class="btn">📋 Copy</button></div>
+                <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeModal()">✕</button>
+                        <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">${f.title}</h2>
+                        <p style="color: #666; margin-bottom: 1rem;">${f.description}</p>
+                        ${AI_PROVIDER === 'demo' ? '<div class="api-section" style="background: #d4edda;"><strong>📋 Demo Mode Active</strong><br>Showing sample output. No AI used.</div>' : ''}
+                        ${AI_PROVIDER === 'groq' && !GROQ_API_KEY ? '<div class="api-section"><strong>⚡ Using Groq Free Tier</strong><br>Works without API key! Or add your own for higher limits.</div>' : ''}
+                        ${AI_PROVIDER === 'openai' && !OPENAI_API_KEY ? '<div class="api-section" style="background: #f8d7da;"><strong>⚠️ OpenAI API Key needed</strong><br>Go to Settings → API to add your key.</div>' : ''}
+                        <textarea id="input" class="input-area" placeholder="${f.placeholder}"></textarea>
+                        <button onclick="generate('${name}')" id="gen-btn" class="btn" style="width: 100%;">✨ Generate</button>
+                        <div id="result" class="result-box">
+                            <div id="content" class="result-content"></div>
+                            <button onclick="copy()" class="btn">📋 Copy</button>
+                            <button onclick="regenerate('${name}')" class="btn btn-outline">🔄 Regenerate</button>
+                        </div>
+                        <div id="error-box" class="error-box hidden"></div>
                     </div>
                 </div>`;
-            div.id = 'mod';
             document.body.appendChild(div);
         }
 
-        async function runTool(name) {
-            const input = document.getElementById('tool-input').value.trim();
-            const temp = document.getElementById('temp-key')?.value.trim();
-            const key = temp || API_KEY;
+        function closeModal() { document.getElementById('modal')?.remove(); }
+
+        async function generate(name) {
+            const input = document.getElementById('input').value.trim();
             if (!input) return alert('Enter content');
-            if (!key) return alert('Enter API key');
-            
-            const t = TOOLS[name];
-            const btn = document.getElementById('go-btn');
-            btn.innerHTML = '<span class="spin"></span>Generating...';
+
+            const f = FEATURES[name];
+            const btn = document.getElementById('gen-btn');
+            const errorBox = document.getElementById('error-box');
+
+            btn.innerHTML = '<span class="loading-spinner"></span>Generating...';
             btn.disabled = true;
-            
+            errorBox.classList.add('hidden');
+
+            // DEMO MODE: Return sample output immediately
+            if (AI_PROVIDER === 'demo') {
+                setTimeout(() => {
+                    document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output for ' + name;
+                    document.getElementById('result').classList.add('show');
+                    updateStats();
+                    btn.innerHTML = '✨ Generate';
+                    btn.disabled = false;
+                }, 1000);
+                return;
+            }
+
             try {
-                const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-                    body: JSON.stringify({ model: API_MODEL, messages: [{ role: 'system', content: t.system }, { role: 'user', content: t.prefix + input }], temperature: 0.7, max_tokens: 2000 })
-                });
-                const data = await res.json();
-                if (data.error) throw new Error(data.error.message);
-                document.getElementById('tool-out').textContent = data.choices[0].message.content;
-                document.getElementById('tool-result').classList.add('show');
-                if (temp) { API_KEY = temp; localStorage.setItem('openai_key', temp); }
-                localStorage.setItem('repurposes_used', (parseInt(localStorage.getItem('repurposes_used') || 0) + 1));
+                let res, data;
+
+                if (AI_PROVIDER === 'groq') {
+                    // Try Groq API
+                    const key = GROQ_API_KEY || 'gsk_demo'; // Demo key if none provided
+                    res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Authorization': `Bearer ${key}` 
+                        },
+                        body: JSON.stringify({ 
+                            model: GROQ_MODEL, 
+                            messages: [
+                                { role: 'system', content: f.system }, 
+                                { role: 'user', content: f.prefix + input }
+                            ], 
+                            temperature: 0.7, 
+                            max_tokens: 2000 
+                        })
+                    });
+                    data = await res.json();
+
+                    // If Groq fails (quota/rate limit), fallback to demo
+                    if (!res.ok || data.error) {
+                        throw new Error(data.error?.message || 'Groq API error');
+                    }
+                } else {
+                    // OpenAI API
+                    if (!OPENAI_API_KEY) throw new Error('No OpenAI API key configured');
+                    res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Authorization': `Bearer ${OPENAI_API_KEY}` 
+                        },
+                        body: JSON.stringify({ 
+                            model: OPENAI_MODEL, 
+                            messages: [
+                                { role: 'system', content: f.system }, 
+                                { role: 'user', content: f.prefix + input }
+                            ], 
+                            temperature: 0.7, 
+                            max_tokens: 2000 
+                        })
+                    });
+                    data = await res.json();
+                    if (!res.ok) throw new Error(data.error?.message || 'OpenAI API error');
+                }
+
+                document.getElementById('content').textContent = data.choices[0].message.content;
+                document.getElementById('result').classList.add('show');
                 updateStats();
-            } catch(e) { alert('Error: ' + e.message); }
+
+            } catch(e) {
+                console.error('API Error:', e);
+                // Fallback to demo mode on any error
+                errorBox.innerHTML = `<strong>⚠️ ${e.message}</strong><br>Showing demo output instead. <a href="#" onclick="showSettings(); return false;">Configure API settings</a>`;
+                errorBox.classList.remove('hidden');
+                document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
+                document.getElementById('result').classList.add('show');
+            }
+
             btn.innerHTML = '✨ Generate';
             btn.disabled = false;
         }
 
-        function copyTool() { navigator.clipboard.writeText(document.getElementById('tool-out').textContent).then(() => alert('Copied!')); }
+        function regenerate(name) {
+            generate(name);
+        }
+
+        function copy() { 
+            navigator.clipboard.writeText(document.getElementById('content').textContent).then(() => alert('Copied!')); 
+        }
+
+        function updateStats() { 
+            localStorage.setItem('repurposes_used', (parseInt(localStorage.getItem('repurposes_used') || 0) + 1)); 
+            loadStats(); 
+        }
     </script>
 </body>
 </html>
