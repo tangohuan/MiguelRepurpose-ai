@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepurposeAI - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary-color: #667eea; --bg-color: #f8f9fa; --card-bg: white; --text-color: #2c3e50; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .navbar h1 { font-size: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .navbar-links { display: flex; align-items: center; gap: 0.5rem; }
+        .navbar a, .navbar button { color: var(--text-color); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 8px 16px; border-radius: 8px; transition: all 0.3s; font-weight: 500; }
+        .navbar a:hover, .navbar button:hover { background: var(--bg-color); color: var(--primary-color); }
+        .navbar button.logout { background: #fee; color: #e74c3c; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .btn { background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin: 5px; font-weight: 500; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-success { background: #27ae60; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
+        .hidden { display: none !important; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .stat { text-align: center; padding: 2rem 1.5rem; background: var(--card-bg); border-radius: 12px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .stat h3 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; font-weight: 700; }
+        .welcome-hero { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .feature-card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 2px solid transparent; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .feature-card:hover { border-color: var(--primary-color); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+        .feature-card h4 { color: var(--primary-color); margin-bottom: 0.5rem; }
+        .settings-layout { display: flex; gap: 2rem; }
+        .settings-sidebar { width: 260px; background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); height: fit-content; position: sticky; top: 100px; }
+        .menu-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; color: var(--text-color); transition: all 0.3s; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
+        .menu-item:hover { background: var(--bg-color); color: var(--primary-color); }
+        .menu-item.active { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; }
+        .settings-content { flex: 1; }
+        .settings-section { margin-bottom: 2rem; }
+        .settings-section h3 { margin-bottom: 1.5rem; color: var(--primary-color); font-size: 1.3rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group select { padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; max-width: 400px; font-size: 0.95rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); }
+        .auth-check { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #e0e0e0; border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
+        .modal-content { background: white; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+        .input-area { width: 100%; min-height: 150px; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 1rem; }
+        .result-box { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color); display: none; }
+        .result-box.show { display: block; }
+        .result-content { white-space: pre-wrap; line-height: 1.6; margin-bottom: 1rem; }
+        .api-section { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+        .api-help { margin-top: 1rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; font-size: 0.9rem; }
+        @media (max-width: 768px) { .settings-layout { flex-direction: column; } .settings-sidebar { width: 100%; position: static; } }
+    </style>
+</head>
+<body>
+    <div id="auth-check" class="auth-check"><div class="spinner"></div><p>Loading...</p></div>
+    
+    <nav class="navbar" id="navbar" style="display: none;">
+        <h1>RepurposeAI</h1>
+        <div class="navbar-links">
+            <a href="#" onclick="showDashboard(); return false;" id="nav-dashboard">Dashboard</a>
+            <a href="pricing.html">Pricing</a>
+            <button onclick="showSettings()" id="nav-settings">Settings</button>
+            <button onclick="logout()" class="logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container" id="main-container" style="display: none;">
+        <div id="dashboard-view">
+            <div class="card welcome-hero">
+                <h2>Welcome back, <span id="user-email">User</span>! 👋</h2>
+                <p>Your current plan: <strong id="user-plan">Free</strong></p>
+            </div>
+
+            <div class="grid">
+                <div class="stat"><h3 id="stat-repurposes">0</h3><p>Repurposes Used</p></div>
+                <div class="stat"><h3 id="stat-templates">5</h3><p>Templates Available</p></div>
+                <div class="stat"><h3 id="stat-credits">100</h3><p>Credits Remaining</p></div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button onclick="openFeature('blog-to-twitter')" class="btn"><span>+</span> Create Content</button>
+                    <a href="pricing.html" class="btn btn-success">Upgrade Plan</a>
+                    <button onclick="showSettings()" class="btn btn-outline">Settings</button>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card" onclick="openFeature('blog-to-twitter')"><h4>📝 Blog to Twitter</h4><p>Transform your blog posts into engaging Twitter threads</p></div>
+                <div class="feature-card" onclick="openFeature('video-to-blog')"><h4>🎥 Video to Blog</h4><p>Convert YouTube videos into well-structured blog articles</p></div>
+                <div class="feature-card" onclick="openFeature('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters from your existing content</p></div>
+                <div class="feature-card" onclick="openFeature('social-posts')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Facebook, and Instagram posts</p></div>
+                <div class="feature-card" onclick="openFeature('image-quotes')"><h4>🎨 Image Quotes</h4><p>Create shareable quote images from your content</p></div>
+                <div class="feature-card" onclick="openFeature('podcast-shownotes')"><h4>🎙️ Podcast Shownotes</h4><p>Generate shownotes and summaries from podcast episodes</p></div>
+            </div>
+        </div>
+
+        <div id="settings-view" class="hidden">
+            <div class="settings-layout">
+                <div class="settings-sidebar">
+                    <div class="menu-item active" onclick="showTab('appearance', this)">🎨 Appearance</div>
+                    <div class="menu-item" onclick="showTab('account', this)">👤 Account</div>
+                    <div class="menu-item" onclick="showTab('notifications', this)">🔔 Notifications</div>
+                    <div class="menu-item" onclick="showTab('api', this)">🔑 API Key</div>
+                </div>
+                
+                <div class="settings-content">
+                    <div id="settings-appearance" class="card settings-section">
+                        <h3>Appearance Settings</h3>
+                        <div class="form-group"><label>Theme Color</label><input type="color" id="theme-color" value="#667eea"></div>
+                        <div class="form-group"><label>Dark Mode</label><select id="dark-mode"><option value="light">☀️ Light</option><option value="dark">🌙 Dark</option><option value="auto">⚡ Auto</option></select></div>
+                        <div class="form-group"><label>Font Size</label><select id="font-size"><option value="14px">Small</option><option value="16px" selected>Normal</option><option value="18px">Large</option></select></div>
+                        <button onclick="applyTheme()" class="btn">Preview Theme</button>
+                        <button onclick="saveSettings()" class="btn btn-success">Save Settings</button>
+                    </div>
+
+                    <div id="settings-account" class="card settings-section hidden">
+                        <h3>Account Settings</h3>
+                        <div class="form-group"><label>Email</label><input type="email" id="account-email" readonly style="background: #f5f5f5;"></div>
+                        <div class="form-group"><label>Plan</label><input type="text" id="account-plan" readonly style="background: #f5f5f5;"></div>
+                        <a href="pricing.html" class="btn">Change Plan</a>
+                        <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
+                    </div>
+
+                    <div id="settings-notifications" class="card settings-section hidden">
+                        <h3>Notification Preferences</h3>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-email" checked> Email notifications</label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-marketing"> Marketing emails</label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;"><input type="checkbox" id="notif-weekly" checked> Weekly summary</label>
+                        <button onclick="saveSettings()" class="btn btn-success">Save Preferences</button>
+                    </div>
+                    
+                    <div id="settings-api" class="card settings-section hidden">
+                        <h3>🔑 OpenAI API Key</h3>
+                        <p style="margin-bottom: 1rem; color: #666;">Enter your OpenAI API key to enable AI content generation. Stored locally in your browser.</p>
+                        
+                        <div class="form-group"><label>API Key</label><input type="password" id="openai-api-key" placeholder="sk-..." style="font-family: monospace;"></div>
+                        <div class="form-group"><label>Model</label><select id="openai-model"><option value="gpt-3.5-turbo">GPT-3.5 Turbo</option><option value="gpt-4">GPT-4</option><option value="gpt-4-turbo-preview">GPT-4 Turbo</option></select></div>
+                        
+                        <button onclick="saveApiKey()" class="btn btn-success">💾 Save API Key</button>
+                        <button onclick="testApiKey()" class="btn btn-outline">🧪 Test Connection</button>
+                        
+                        <div class="api-help">
+                            <strong>How to get your API Key:</strong>
+                            <ol style="margin-left: 1.2rem; margin-top: 0.5rem;">
+                                <li>Go to <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a></li>
+                                <li>Sign up or log in</li>
+                                <li>Click "Create new secret key"</li>
+                                <li>Copy and paste it here</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let OPENAI_API_KEY = localStorage.getItem('openai_api_key') || '';
+        let OPENAI_MODEL = localStorage.getItem('openai_model') || 'gpt-3.5-turbo';
+        
+        const FEATURES = {
+            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:\n\n' },
+            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post with markdown.', prefix: 'Convert to blog post:\n\n' },
+            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste content...', system: 'Create engaging newsletter with subject, greeting, CTA, sign-off.', prefix: 'Create newsletter from:\n\n' },
+            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Paste content...', system: 'Create LinkedIn, Twitter, and Instagram versions of this content.', prefix: 'Create social posts from:\n\n' },
+            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes from:\n\n' },
+            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps, quotes, resources.', prefix: 'Create shownotes from:\n\n' }
+        };
+
+        // Init
+        (function() {
+            if (!localStorage.getItem('token')) { window.location.href = 'login.html'; return; }
+            document.getElementById('auth-check').style.display = 'none';
+            document.getElementById('navbar').style.display = 'flex';
+            document.getElementById('main-container').style.display = 'block';
+            
+            let user = {};
+            try { user = JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) {}
+            document.getElementById('user-email').textContent = user.email || 'User';
+            document.getElementById('account-email').value = user.email || 'User';
+            document.getElementById('account-plan').value = user.plan || 'Free';
+            document.getElementById('user-plan').textContent = user.plan || 'Free';
+            
+            if (OPENAI_API_KEY) document.getElementById('openai-api-key').value = OPENAI_API_KEY;
+            document.getElementById('openai-model').value = OPENAI_MODEL;
+            
+            loadStats();
+            loadSettings();
+        })();
+
+        function loadStats() {
+            document.getElementById('stat-repurposes').textContent = localStorage.getItem('repurposes_used') || '0';
+            document.getElementById('stat-credits').textContent = localStorage.getItem('credits_remaining') || '100';
+        }
+
+        function logout() { if(confirm('Logout?')) { localStorage.clear(); window.location.href = 'login.html'; } }
+        function showDashboard() { document.getElementById('settings-view').classList.add('hidden'); document.getElementById('dashboard-view').classList.remove('hidden'); document.getElementById('nav-settings').style.display = 'inline-block'; document.getElementById('nav-dashboard').textContent = 'Dashboard'; }
+        function showSettings() { document.getElementById('dashboard-view').classList.add('hidden'); document.getElementById('settings-view').classList.remove('hidden'); document.getElementById('nav-settings').style.display = 'none'; document.getElementById('nav-dashboard').textContent = '← Back'; }
+        
+        function showTab(tab, el) {
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById('settings-' + tab).classList.remove('hidden');
+            el.classList.add('active');
+        }
+
+        function applyTheme() {
+            const root = document.documentElement;
+            root.style.setProperty('--primary-color', document.getElementById('theme-color').value);
+            const isDark = document.getElementById('dark-mode').value === 'dark' || (document.getElementById('dark-mode').value === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            root.style.setProperty('--bg-color', isDark ? '#0f0f23' : '#f8f9fa');
+            root.style.setProperty('--card-bg', isDark ? '#1a1a2e' : '#ffffff');
+            root.style.setProperty('--text-color', isDark ? '#eaeaea' : '#2c3e50');
+            root.style.fontSize = document.getElementById('font-size').value;
+        }
+
+        function saveSettings() {
+            localStorage.setItem('userSettings', JSON.stringify({
+                themeColor: document.getElementById('theme-color').value,
+                darkMode: document.getElementById('dark-mode').value,
+                fontSize: document.getElementById('font-size').value,
+                notifEmail: document.getElementById('notif-email').checked,
+                notifMarketing: document.getElementById('notif-marketing').checked,
+                notifWeekly: document.getElementById('notif-weekly').checked
+            }));
+            applyTheme();
+            alert('Settings saved!');
+        }
+
+        function loadSettings() {
+            const s = JSON.parse(localStorage.getItem('userSettings') || '{}');
+            if (s.themeColor) document.getElementById('theme-color').value = s.themeColor;
+            if (s.darkMode) document.getElementById('dark-mode').value = s.darkMode;
+            if (s.fontSize) document.getElementById('font-size').value = s.fontSize;
+            if (s.notifEmail !== undefined) document.getElementById('notif-email').checked = s.notifEmail;
+            if (s.notifMarketing !== undefined) document.getElementById('notif-marketing').checked = s.notifMarketing;
+            if (s.notifWeekly !== undefined) document.getElementById('notif-weekly').checked = s.notifWeekly;
+            applyTheme();
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('openai-api-key').value.trim();
+            if (!key) return alert('Enter API key');
+            if (!key.startsWith('sk-')) return alert('Key must start with sk-');
+            OPENAI_API_KEY = key;
+            OPENAI_MODEL = document.getElementById('openai-model').value;
+            localStorage.setItem('openai_api_key', key);
+            localStorage.setItem('openai_model', OPENAI_MODEL);
+            alert('API Key saved!');
+        }
+
+        async function testApiKey() {
+            const key = document.getElementById('openai-api-key').value.trim() || OPENAI_API_KEY;
+            if (!key) return alert('Enter API key first');
+            const btn = event.target;
+            btn.innerHTML = '<span class="loading-spinner"></span>Testing...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${key}` } });
+                alert(res.ok ? '✅ API Key valid!' : '❌ Invalid key');
+            } catch(e) { alert('❌ Error: ' + e.message); }
+            btn.textContent = '🧪 Test Connection';
+            btn.disabled = false;
+        }
+
+        function openFeature(name) {
+            const f = FEATURES[name];
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeModal()">✕</button>
+                        <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">${f.title}</h2>
+                        <p style="color: #666; margin-bottom: 1rem;">${f.description}</p>
+                        ${!OPENAI_API_KEY ? '<div class="api-section"><strong>⚠️ API Key needed</strong><input type="password" id="temp-key" placeholder="sk-..." style="width: 100%; margin-top: 0.5rem;"></div>' : ''}
+                        <textarea id="input" class="input-area" placeholder="${f.placeholder}"></textarea>
+                        <button onclick="generate('${name}')" id="gen-btn" class="btn" style="width: 100%;">✨ Generate</button>
+                        <div id="result" class="result-box"><div id="content" class="result-content"></div><button onclick="copy()" class="btn">📋 Copy</button></div>
+                    </div>
+                </div>`;
+            document.body.appendChild(div);
+        }
+
+        function closeModal() { document.getElementById('modal')?.remove(); }
+
+        async function generate(name) {
+            const input = document.getElementById('input').value.trim();
+            const tempKey = document.getElementById('temp-key')?.value.trim();
+            const key = tempKey || OPENAI_API_KEY;
+            if (!input) return alert('Enter content');
+            if (!key) return alert('Enter API key');
+            
+            const f = FEATURES[name];
+            const btn = document.getElementById('gen-btn');
+            btn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({ model: OPENAI_MODEL, messages: [{ role: 'system', content: f.system }, { role: 'user', content: f.prefix + input }], temperature: 0.7, max_tokens: 2000 })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+                document.getElementById('content').textContent = data.choices[0].message.content;
+                document.getElementById('result').classList.add('show');
+                if (tempKey) { OPENAI_API_KEY = tempKey; localStorage.setItem('openai_api_key', tempKey); }
+                updateStats();
+            } catch(e) { alert('Error: ' + e.message); }
+            btn.innerHTML = '✨ Generate';
+            btn.disabled = false;
+        }
+
+        function copy() { navigator.clipboard.writeText(document.getElementById('content').textContent).then(() => alert('Copied!')); }
+        function updateStats() { localStorage.setItem('repurposes_used', (parseInt(localStorage.getItem('repurposes_used') || 0) + 1)); localStorage.setItem('credits_remaining', Math.max(0, parseInt(localStorage.getItem('credits_remaining') || 100) - 1)); loadStats(); }
+    </script>
+</body>
+</html>

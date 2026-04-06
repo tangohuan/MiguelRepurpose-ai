@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Pricing - RepurposeAI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --bg: #f8f9fa;
+            --card: white;
+            --text: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .navbar { 
+            background: white; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar h1 { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-links { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+        }
+        
+        .navbar a { 
+            color: var(--text); 
+            text-decoration: none; 
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .navbar a:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 4rem 2rem; 
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 { 
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .header p { 
+            color: #666; 
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .billing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .toggle-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .save-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .pricing-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 2rem; 
+            margin-top: 2rem;
+        }
+        
+        .pricing-card { 
+            background: var(--card); 
+            border-radius: 16px; 
+            padding: 2.5rem 2rem; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+        
+        .pricing-card.featured { 
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.02) translateY(-5px);
+        }
+        
+        .badge { 
+            position: absolute; 
+            top: -12px; 
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; 
+            padding: 0.5rem 1.5rem; 
+            border-radius: 20px; 
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .plan-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-card h2 { 
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price { 
+            font-size: 3.5rem; 
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+        
+        .price .currency { font-size: 1.5rem; font-weight: 500; }
+        .price .amount { line-height: 1; }
+        .price .period { 
+            font-size: 1rem; 
+            color: #666;
+            font-weight: 400;
+            align-self: flex-end;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-yearly {
+            display: none;
+        }
+        
+        .yearly .price-monthly { display: none; }
+        .yearly .price-yearly { display: flex; }
+        
+        .yearly-savings {
+            color: var(--success);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .plan-desc { 
+            color: #666; 
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .features { 
+            list-style: none; 
+            margin: 1.5rem 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+        
+        .features li { 
+            padding: 0.75rem 0; 
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .features li:last-child { border-bottom: none; }
+        
+        .features li.included::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .features li.not-included::before {
+            content: '✕';
+            color: #ccc;
+            font-size: 1.2rem;
+        }
+        
+        .btn { 
+            display: inline-block; 
+            padding: 1rem 2rem; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-success { 
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline { 
+            border: 2px solid var(--primary); 
+            color: var(--primary); 
+            background: transparent;
+        }
+        
+        .btn-outline:hover { 
+            background: var(--primary); 
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .current-plan {
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .guarantee {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .guarantee h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq {
+            margin-top: 4rem;
+        }
+        
+        .faq h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .faq-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .faq-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; }
+            .navbar h1 { font-size: 1.2rem; }
+            .container { padding: 2rem 1rem; }
+            .header h1 { font-size: 2rem; }
+            .pricing-card.featured { transform: none; }
+            .pricing-card.featured:hover { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>RepurposeAI</h1>
+        <div class="navbar-links">
+            <a href="newdash.html">Dashboard</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Simple, Transparent Pricing</h1>
+            <p>Choose the plan that works best for your content creation needs. Upgrade or downgrade anytime.</p>
+        </div>
+
+        <div class="billing-toggle">
+            <button class="toggle-btn active" onclick="setBilling('monthly', this)">Monthly</button>
+            <button class="toggle-btn" onclick="setBilling('yearly', this)">Yearly</button>
+            <span class="save-badge">Save 20%</span>
+        </div>
+
+        <div class="pricing-grid" id="pricing-grid">
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <div class="plan-icon">🚀</div>
+                <h2>Starter</h2>
+                <div class="price price-monthly">
+                    <span class="currency">$</span>
+                    <span class="amount">0</span>
+                    <span class="period">/month</span>
+                </div>
+                <div class="price price-yearly">
+                    <span class="currency">$</span>
+                    <span class="amount">0</span>
+                    <span class="period">/year</span>
+                </div>
+                <p class="plan-desc">Perfect for getting started with AI content repurposing</p>
+                <ul class="features">
+                    <li class="included">5 repurposes per month</li>
+                    <li class="included">3 basic templates</li>
+                    <li class="included">Email support</li>
+                    <li class="not-included">API access</li>
+                    <li class="not-included">Custom branding</li>
+                    <li class="not-included">Priority processing</li>
+                </ul>
+                <a href="#" class="btn btn-outline" id="btn-starter">Current Plan</a>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="pricing-card featured">
+                <div class="badge">Most Popular</div>
+                <div class="plan-icon">⭐</div>
+                <h2>Pro</h2>
+                <div class="price price-monthly">
+                    <span class="currency">$</span>
+                    <span class="amount">29</span>
+                    <span class="period">/month</span>
+                </div>
+                <div class="price price-yearly">
+                    <span class="currency">$</span>
+                    <span class="amount">279</span>
+                    <span class="period">/year</span>
+                </div>
+                <div class="yearly-savings" style="display: none;">Save $69/year</div>
+                <p class="plan-desc">For serious content creators who need unlimited power</p>
+                <ul class="features">
+                    <li class="included">Unlimited repurposes</li>
+                    <li class="included">All premium templates</li>
+                    <li class="included">Priority email support</li>
+                    <li class="included">API access</li>
+                    <li class="included">Gumroad integration</li>
+                    <li class="not-included">Custom branding</li>
+                </ul>
+                <!-- PRO MONTHLY: https://repurposeai.gumroad.com/l/rxsjx -->
+                <!-- PRO YEARLY: https://repurposeai.gumroad.com/l/zmylby -->
+                <a href="https://repurposeai.gumroad.com/l/rxsjx" class="btn btn-primary" id="btn-pro-monthly" target="_blank">
+                    Upgrade to Pro
+                </a>
+                <a href="https://repurposeai.gumroad.com/l/zmylby" class="btn btn-primary hidden" id="btn-pro-yearly" target="_blank">
+                    Upgrade to Pro (Yearly)
+                </a>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <div class="plan-icon">🏢</div>
+                <h2>Enterprise</h2>
+                <div class="price price-monthly">
+                    <span class="currency">$</span>
+                    <span class="amount">99</span>
+                    <span class="period">/month</span>
+                </div>
+                <div class="price price-yearly">
+                    <span class="currency">$</span>
+                    <span class="amount">950</span>
+                    <span class="period">/year</span>
+                </div>
+                <div class="yearly-savings" style="display: none;">Save $238/year</div>
+                <p class="plan-desc">For teams and agencies with advanced needs</p>
+                <ul class="features">
+                    <li class="included">Everything in Pro</li>
+                    <li class="included">Custom branding</li>
+                    <li class="included">Team collaboration (5 seats)</li>
+                    <li class="included">Dedicated support</li>
+                    <li class="included">Custom integrations</li>
+                    <li class="included">White-label option</li>
+                </ul>
+                <!-- ENTERPRISE MONTHLY: https://repurposeai.gumroad.com/l/twmqxh -->
+                <!-- ENTERPRISE YEARLY: https://repurposeai.gumroad.com/l/dyriw -->
+                <a href="https://repurposeai.gumroad.com/l/twmqxh" class="btn btn-success" id="btn-enterprise-monthly" target="_blank">
+                    Get Enterprise
+                </a>
+                <a href="https://repurposeai.gumroad.com/l/dyriw" class="btn btn-success hidden" id="btn-enterprise-yearly" target="_blank">
+                    Get Enterprise (Yearly)
+                </a>
+            </div>
+        </div>
+
+        <div class="guarantee">
+            <h3>🛡️ 30-Day Money-Back Guarantee</h3>
+            <p>Not satisfied? Get a full refund within 30 days, no questions asked.</p>
+        </div>
+
+        <div class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <h4>Can I change plans anytime?</h4>
+                <p>Yes! You can upgrade, downgrade, or cancel your subscription at any time from your account settings.</p>
+            </div>
+            <div class="faq-item">
+                <h4>What payment methods do you accept?</h4>
+                <p>We accept all major credit cards, PayPal, and Apple Pay through our secure Gumroad checkout.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Is there a free trial?</h4>
+                <p>Yes! Start with our free Starter plan and upgrade when you're ready. No credit card required.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if logged in
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+
+        // Get user plan
+        let userPlan = 'free';
+        try {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            userPlan = (user.plan || 'free').toLowerCase();
+        } catch(e) {}
+
+        // Toggle monthly/yearly billing
+        function setBilling(type, btn) {
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const grid = document.getElementById('pricing-grid');
+            const savings = document.querySelectorAll('.yearly-savings');
+            
+            if (type === 'yearly') {
+                grid.classList.add('yearly');
+                savings.forEach(s => s.style.display = 'block');
+                
+                // Show yearly buttons, hide monthly
+                document.getElementById('btn-pro-monthly').classList.add('hidden');
+                document.getElementById('btn-pro-yearly').classList.remove('hidden');
+                document.getElementById('btn-enterprise-monthly').classList.add('hidden');
+                document.getElementById('btn-enterprise-yearly').classList.remove('hidden');
+            } else {
+                grid.classList.remove('yearly');
+                savings.forEach(s => s.style.display = 'none');
+                
+                // Show monthly buttons, hide yearly
+                document.getElementById('btn-pro-monthly').classList.remove('hidden');
+                document.getElementById('btn-pro-yearly').classList.add('hidden');
+                document.getElementById('btn-enterprise-monthly').classList.remove('hidden');
+                document.getElementById('btn-enterprise-yearly').classList.add('hidden');
+            }
+        }
+
+        // Update buttons based on current plan
+        function updateButtons() {
+            if (userPlan === 'free') {
+                document.getElementById('btn-starter').textContent = 'Current Plan';
+                document.getElementById('btn-starter').onclick = () => alert('You are on the Starter plan!');
+            } else if (userPlan === 'pro') {
+                document.getElementById('btn-starter').textContent = 'Downgrade';
+                document.getElementById('btn-pro-monthly').textContent = 'Current Plan';
+                document.getElementById('btn-pro-yearly').textContent = 'Current Plan';
+                document.getElementById('btn-pro-monthly').className = 'btn btn-outline';
+                document.getElementById('btn-pro-yearly').className = 'btn btn-outline';
+                document.getElementById('btn-pro-monthly').onclick = () => alert('You are on the Pro plan!');
+                document.getElementById('btn-pro-yearly').onclick = () => alert('You are on the Pro plan!');
+            } else if (userPlan === 'enterprise') {
+                document.getElementById('btn-starter').style.display = 'none';
+                document.getElementById('btn-pro-monthly').style.display = 'none';
+                document.getElementById('btn-pro-yearly').style.display = 'none';
+                document.getElementById('btn-enterprise-monthly').textContent = 'Current Plan';
+                document.getElementById('btn-enterprise-yearly').textContent = 'Current Plan';
+                document.getElementById('btn-enterprise-monthly').className = 'btn btn-outline';
+                document.getElementById('btn-enterprise-yearly').className = 'btn btn-outline';
+                document.getElementById('btn-enterprise-monthly').onclick = () => alert('You are on the Enterprise plan!');
+                document.getElementById('btn-enterprise-yearly').onclick = () => alert('You are on the Enterprise plan!');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Initialize
+        updateButtons();
+    </script>
+</body>
+</html>

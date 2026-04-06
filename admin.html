@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepurposeAI - Admin Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #667eea; --primary-dark: #764ba2; --bg: #f8f9fa; --card: white; --text: #2c3e50; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .admin-badge { background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .navbar { background: #1a1a2e; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100; }
+        .navbar h1 { display: flex; align-items: center; gap: 1rem; font-size: 1.5rem; }
+        .navbar a, .navbar button { color: white; text-decoration: none; background: none; border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: all 0.3s; font-weight: 500; }
+        .navbar a:hover, .navbar button:hover { background: rgba(255,255,255,0.1); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .admin-grid { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        .sidebar { background: var(--card); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 100px; }
+        .sidebar h3 { padding: 1rem; color: #666; font-size: 0.875rem; text-transform: uppercase; }
+        .nav-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem; transition: all 0.3s; font-weight: 500; }
+        .nav-item:hover { background: var(--bg); color: var(--primary); }
+        .nav-item.active { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
+        .main-content { display: flex; flex-direction: column; gap: 2rem; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+        .stat-card { background: var(--card); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); }
+        .stat-card h4 { color: #666; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--text); }
+        .card { background: var(--card); border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h2 { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { font-weight: 600; color: #666; font-size: 0.875rem; text-transform: uppercase; }
+        tr:hover { background: var(--bg); }
+        .badge { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-free { background: #e3f2fd; color: #1976d2; }
+        .badge-pro { background: #e8f5e9; color: #388e3c; }
+        .badge-enterprise { background: #fff3e0; color: #f57c00; }
+        .badge-admin { background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); color: white; }
+        .actions { display: flex; gap: 0.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .hidden { display: none !important; }
+        .system-status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .status-item { padding: 1rem; border-radius: 8px; text-align: center; }
+        .status-item.online { background: #e8f5e9; color: #2e7d32; }
+        .status-item.warning { background: #fff3e0; color: #f57c00; }
+        @media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .stats-row { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>RepurposeAI <span class="admin-badge">Admin</span></h1>
+        <div class="navbar-links">
+            <a href="newdash.html">User Dashboard</a>
+            <a href="pricing.html">Pricing</a>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-grid">
+            <div class="sidebar">
+                <h3>Management</h3>
+                <div class="nav-item active" onclick="showSection('overview', this)">📊 Overview</div>
+                <div class="nav-item" onclick="showSection('users', this)">👥 Users</div>
+                <div class="nav-item" onclick="showSection('content', this)">📝 Content</div>
+                <div class="nav-item" onclick="showSection('payments', this)">💰 Payments</div>
+                <div class="nav-item" onclick="showSection('settings', this)">⚙️ Settings</div>
+                <div class="nav-item" onclick="showSection('api', this)">🔑 API</div>
+                <div class="nav-item" onclick="showSection('logs', this)">📋 Logs</div>
+            </div>
+
+            <div class="main-content">
+                <!-- Overview -->
+                <div id="section-overview" class="section-content">
+                    <div class="stats-row">
+                        <div class="stat-card"><h4>Total Users</h4><div class="value" id="stat-users">0</div></div>
+                        <div class="stat-card"><h4>Revenue</h4><div class="value" id="stat-revenue"></div></div>
+                        <div class="stat-card"><h4>Content</h4><div class="value" id="stat-content">0</div></div>
+                        <div class="stat-card"><h4>Health</h4><div class="value" style="color: var(--success);">98%</div></div>
+                    </div>
+
+                    <div class="card">
+                        <h2>System Status</h2>
+                        <div class="system-status">
+                            <div class="status-item online"><div style="font-size: 2rem;">🟢</div><div><strong>API</strong></div><div>Online</div></div>
+                            <div class="status-item online"><div style="font-size: 2rem;">🟢</div><div><strong>DB</strong></div><div>Online</div></div>
+                            <div class="status-item warning"><div style="font-size: 2rem;">🟡</div><div><strong>Email</strong></div><div>Delayed</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div id="section-users" class="section-content hidden">
+                    <div class="card">
+                        <h2>User Management <button class="btn btn-success" onclick="addUser()">+ Add</button></h2>
+                        <table>
+                            <thead><tr><th>Email</th><th>Plan</th><th>Joined</th><th>Actions</th></tr></thead>
+                            <tbody id="users-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div id="section-content" class="section-content hidden">
+                    <div class="card">
+                        <h2>Content Stats</h2>
+                        <div class="stats-row">
+                            <div class="stat-card"><h4>Blog→Twitter</h4><div class="value">1,234</div></div>
+                            <div class="stat-card"><h4>Video→Blog</h4><div class="value">567</div></div>
+                            <div class="stat-card"><h4>Newsletters</h4><div class="value">890</div></div>
+                            <div class="stat-card"><h4>Social</h4><div class="value">2,345</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments -->
+                <div id="section-payments" class="section-content hidden">
+                    <div class="card">
+                        <h2>Payments</h2>
+                        <table>
+                            <thead><tr><th>Date</th><th>User</th><th>Plan</th><th>Amount</th></tr></thead>
+                            <tbody><tr><td>2026-04-06</td><td>user@test.com</td><td><span class="badge badge-pro">Pro</span></td><td></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div id="section-settings" class="section-content hidden">
+                    <div class="card">
+                        <h2>Site Settings</h2>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Site Name</label><input type="text" id="site-name" value="RepurposeAI"></div>
+                            <div class="form-group"><label>Support Email</label><input type="email" id="support-email" value="support@repurposeai.com"></div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+                    </div>
+                    <div class="card">
+                        <h2 style="color: var(--danger);">Danger Zone</h2>
+                        <button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
+                        <button class="btn btn-danger" onclick="exportData()" style="margin-left: 0.5rem;">Export Data</button>
+                    </div>
+                </div>
+
+                <!-- API -->
+                <div id="section-api" class="section-content hidden">
+                    <div class="card">
+                        <h2>API Config</h2>
+                        <div class="form-group"><label>Global OpenAI Key</label><input type="password" id="global-key" placeholder="sk-..."></div>
+                        <div class="form-group"><label>Default Model</label><select id="default-model"><option>gpt-3.5-turbo</option><option>gpt-4</option></select></div>
+                        <button class="btn btn-primary" onclick="saveApi()">Save</button>
+                    </div>
+                </div>
+
+                <!-- Logs -->
+                <div id="section-logs" class="section-content hidden">
+                    <div class="card">
+                        <h2>System Logs</h2>
+                        <div style="background: #1a1a2e; color: #0f0; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.875rem;">
+                            <div>[2026-04-06] Admin logged in</div>
+                            <div>[2026-04-06] System check passed</div>
+                            <div>[2026-04-06] Payment: </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_EMAIL = "admin@repurposeai.com";
+
+        (function init() {
+            const token = localStorage.getItem("token");
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            
+            if (!token || user.email !== ADMIN_EMAIL) {
+                alert("Admin access required");
+                window.location.href = "login.html";
+                return;
+            }
+            
+            loadUsers();
+            loadStats();
+        })();
+
+        function showSection(section, el) {
+            document.querySelectorAll(".section-content").forEach(s => s.classList.add("hidden"));
+            document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+            document.getElementById("section-" + section).classList.remove("hidden");
+            el.classList.add("active");
+        }
+
+        function loadStats() {
+            const users = JSON.parse(localStorage.getItem("all_users") || "[]");
+            let revenue = 0;
+            users.forEach(u => { if(u.plan==="pro") revenue+=29; if(u.plan==="enterprise") revenue+=99; });
+            document.getElementById("stat-users").textContent = users.length || 1;
+            document.getElementById("stat-revenue").textContent = "$" + revenue;
+            document.getElementById("stat-content").textContent = localStorage.getItem("total_content") || "0";
+        }
+
+        function loadUsers() {
+            let users = JSON.parse(localStorage.getItem("all_users") || "[]");
+            if (users.length === 0) {
+                const current = JSON.parse(localStorage.getItem("user") || "{}");
+                if (current.email) {
+                    users.push({email: current.email, plan: "admin", joined: new Date().toISOString().split("T")[0]});
+                    localStorage.setItem("all_users", JSON.stringify(users));
+                }
+            }
+            document.getElementById("users-table").innerHTML = users.map(u => 
+                <tr>
+                    <td></td>
+                    <td><span class="badge badge-"></span></td>
+                    <td></td>
+                    <td class="actions">
+                        <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editUser('')">Edit</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteUser('')">Delete</button>
+                    </td>
+                </tr>
+            ).join("");
+        }
+
+        function addUser() {
+            const email = prompt("Email:");
+            if (!email) return;
+            const users = JSON.parse(localStorage.getItem("all_users") || "[]");
+            users.push({email: email, plan: "free", joined: new Date().toISOString().split("T")[0]});
+            localStorage.setItem("all_users", JSON.stringify(users));
+            loadUsers();
+        }
+
+        function editUser(email) {
+            const plan = prompt("New plan (free/pro/enterprise):");
+            if (!plan) return;
+            let users = JSON.parse(localStorage.getItem("all_users") || "[]");
+            const user = users.find(u => u.email === email);
+            if (user) { user.plan = plan; localStorage.setItem("all_users", JSON.stringify(users)); loadUsers(); }
+        }
+
+        function deleteUser(email) {
+            if (!confirm("Delete " + email + "?")) return;
+            let users = JSON.parse(localStorage.getItem("all_users") || "[]");
+            users = users.filter(u => u.email !== email);
+            localStorage.setItem("all_users", JSON.stringify(users));
+            loadUsers();
+        }
+
+        function saveSettings() {
+            localStorage.setItem("site_name", document.getElementById("site-name").value);
+            localStorage.setItem("support_email", document.getElementById("support-email").value);
+            alert("Saved!");
+        }
+
+        function saveApi() {
+            localStorage.setItem("global_key", document.getElementById("global-key").value);
+            localStorage.setItem("default_model", document.getElementById("default-model").value);
+            alert("API config saved!");
+        }
+
+        function clearAll() {
+            if (!confirm("Clear ALL data?")) return;
+            Object.keys(localStorage).forEach(k => { if (!k.includes("token") && !k.includes("user")) localStorage.removeItem(k); });
+            alert("Cleared!");
+            location.reload();
+        }
+
+        function exportData() {
+            const data = { users: JSON.parse(localStorage.getItem("all_users") || "[]"), exported: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "export-" + new Date().toISOString().split("T")[0] + ".json";
+            a.click();
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
