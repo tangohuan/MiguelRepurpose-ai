@@ -6,34 +6,51 @@
     <title>RepurposeAI - Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; color: #2c3e50; line-height: 1.6; }
-        .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .navbar h1 { font-size: 1.5rem; color: #667eea; }
-        .navbar-links { display: flex; gap: 1rem; }
-        .navbar a, .navbar button { color: #2c3e50; text-decoration: none; background: none; border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px; }
+        :root { --primary-color: #667eea; --bg-color: #f8f9fa; --card-bg: white; --text-color: #2c3e50; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .navbar h1 { font-size: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .navbar-links { display: flex; align-items: center; gap: 0.5rem; }
+        .navbar a, .navbar button { color: var(--text-color); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 8px 16px; border-radius: 8px; transition: all 0.3s; font-weight: 500; }
+        .navbar a:hover, .navbar button:hover { background: var(--bg-color); color: var(--primary-color); }
         .navbar button.logout { background: #fee; color: #e74c3c; }
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .btn { background: #667eea; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .btn { background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin: 5px; font-weight: 500; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
         .btn-success { background: #27ae60; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
         .hidden { display: none !important; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .stat { text-align: center; padding: 2rem; background: white; border-radius: 12px; border-top: 4px solid #667eea; }
-        .stat h3 { font-size: 2.5rem; color: #667eea; }
-        .welcome-hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
+        .stat { text-align: center; padding: 2rem 1.5rem; background: var(--card-bg); border-radius: 12px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .stat h3 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; font-weight: 700; }
+        .welcome-hero { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
         .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .feature-card { background: white; border-radius: 12px; padding: 1.5rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
-        .feature-card h4 { color: #667eea; }
+        .feature-card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 2px solid transparent; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .feature-card:hover { border-color: var(--primary-color); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+        .feature-card h4 { color: var(--primary-color); margin-bottom: 0.5rem; }
+        .settings-layout { display: flex; gap: 2rem; }
+        .settings-sidebar { width: 260px; background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); height: fit-content; position: sticky; top: 100px; }
+        .menu-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; color: var(--text-color); transition: all 0.3s; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
+        .menu-item:hover { background: var(--bg-color); color: var(--primary-color); }
+        .menu-item.active { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; }
+        .settings-content { flex: 1; }
+        .settings-section { margin-bottom: 2rem; }
+        .settings-section h3 { margin-bottom: 1.5rem; color: var(--primary-color); font-size: 1.3rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group select { padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; max-width: 400px; font-size: 0.95rem; }
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
         .modal-content { background: white; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
         .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
         .input-area { width: 100%; min-height: 150px; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 1rem; }
-        .result-box { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea; display: none; }
+        .result-box { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color); display: none; }
         .result-box.show { display: block; }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .error-box { background: #fee; border: 1px solid #e74c3c; color: #c0392b; padding: 1rem; border-radius: 8px; margin-top: 1rem; display: none; }
+        .success-box { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        @media (max-width: 768px) { .settings-layout { flex-direction: column; } .settings-sidebar { width: 100%; position: static; } }
     </style>
 <base target="_blank">
 </head>
@@ -41,36 +58,88 @@
     <nav class="navbar">
         <h1>RepurposeAI</h1>
         <div class="navbar-links">
+            <a href="index.html">Dashboard</a>
             <a href="pricing.html">Pricing</a>
+            <button onclick="showSettings()">Settings</button>
             <button onclick="logout()" class="logout">Logout</button>
         </div>
     </nav>
 
     <div class="container">
-        <div class="card welcome-hero">
-            <h2>Welcome back! 👋</h2>
-            <p>Your current plan: <strong>Free</strong> (Powered by Groq AI)</p>
+        <div id="dashboard-view">
+            <div class="card welcome-hero">
+                <h2>Welcome back! 👋</h2>
+                <p>Your current plan: <strong>Free</strong> (Powered by Groq AI)</p>
+            </div>
+
+            <div class="grid">
+                <div class="stat"><h3 id="stat-repurposes">0</h3><p>Repurposes Used</p></div>
+                <div class="stat"><h3>5</h3><p>Templates Available</p></div>
+                <div class="stat"><h3>∞</h3><p>Unlimited Credits</p></div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+                <button onclick="openFeature('blog-to-twitter')" class="btn">📝 Blog to Twitter</button>
+                <button onclick="openFeature('video-to-blog')" class="btn">🎥 Video to Blog</button>
+                <button onclick="openFeature('newsletter')" class="btn">📧 Newsletter</button>
+                <button onclick="openFeature('social-posts')" class="btn">📱 Social Posts</button>
+                <button onclick="openFeature('image-quotes')" class="btn">🎨 Image Quotes</button>
+                <button onclick="openFeature('podcast-shownotes')" class="btn">🎙️ Podcast Shownotes</button>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card" onclick="openFeature('blog-to-twitter')"><h4>📝 Blog to Twitter</h4><p>Transform your blog posts into engaging Twitter threads</p></div>
+                <div class="feature-card" onclick="openFeature('video-to-blog')"><h4>🎥 Video to Blog</h4><p>Convert YouTube videos into well-structured blog articles</p></div>
+                <div class="feature-card" onclick="openFeature('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters from your existing content</p></div>
+                <div class="feature-card" onclick="openFeature('social-posts')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Facebook, and Instagram posts</p></div>
+                <div class="feature-card" onclick="openFeature('image-quotes')"><h4>🎨 Image Quotes</h4><p>Create shareable quote images from your content</p></div>
+                <div class="feature-card" onclick="openFeature('podcast-shownotes')"><h4>🎙️ Podcast Shownotes</h4><p>Generate shownotes and summaries from podcast episodes</p></div>
+            </div>
         </div>
 
-        <div class="grid">
-            <div class="stat"><h3 id="stat-repurposes">0</h3><p>Repurposes Used</p></div>
-            <div class="stat"><h3>5</h3><p>Templates Available</p></div>
-            <div class="stat"><h3>∞</h3><p>Unlimited Credits</p></div>
-        </div>
+        <div id="settings-view" class="hidden">
+            <div class="settings-layout">
+                <div class="settings-sidebar">
+                    <div class="menu-item active" onclick="showTab('appearance', this)">🎨 Appearance</div>
+                    <div class="menu-item" onclick="showTab('account', this)">👤 Account</div>
+                    <div class="menu-item" onclick="showTab('api', this)">🔑 API Settings</div>
+                </div>
 
-        <div class="card" style="margin-top: 2rem;">
-            <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
-            <button onclick="openFeature('social-posts')" class="btn">📱 Generate Social Posts</button>
-            <button onclick="openFeature('blog-to-twitter')" class="btn">📝 Blog to Twitter</button>
-            <button onclick="openFeature('video-to-blog')" class="btn">🎥 Video to Blog</button>
-            <button onclick="openFeature('newsletter')" class="btn">📧 Newsletter</button>
-        </div>
+                <div class="settings-content">
+                    <div id="settings-appearance" class="card settings-section">
+                        <h3>Appearance Settings</h3>
+                        <div class="form-group"><label>Theme Color</label><input type="color" id="theme-color" value="#667eea"></div>
+                        <button onclick="applyTheme()" class="btn">Apply Theme</button>
+                    </div>
 
-        <div class="feature-grid">
-            <div class="feature-card" onclick="openFeature('social-posts')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Twitter, and Instagram posts</p></div>
-            <div class="feature-card" onclick="openFeature('blog-to-twitter')"><h4>📝 Blog to Twitter</h4><p>Transform blog posts into Twitter threads</p></div>
-            <div class="feature-card" onclick="openFeature('video-to-blog')"><h4>🎥 Video to Blog</h4><p>Convert videos into blog articles</p></div>
-            <div class="feature-card" onclick="openFeature('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters</p></div>
+                    <div id="settings-account" class="card settings-section hidden">
+                        <h3>Account Settings</h3>
+                        <p>Email: <span id="user-email-display">user@example.com</span></p>
+                        <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
+                    </div>
+
+                    <div id="settings-api" class="card settings-section hidden">
+                        <h3>🔑 API Settings</h3>
+                        <div class="success-box">
+                            <strong>✅ Groq AI (Free Tier)</strong><br>
+                            <small>Get your free API key at console.groq.com</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Groq API Key</label>
+                            <input type="password" id="groq-api-key" placeholder="gsk_...">
+                        </div>
+                        <div class="form-group">
+                            <label>Model</label>
+                            <select id="groq-model">
+                                <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
+                                <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
+                            </select>
+                        </div>
+                        <button onclick="saveApiKey()" class="btn btn-success">💾 Save API Key</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -80,51 +149,77 @@
         let GROQ_MODEL = localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile';
 
         const FEATURES = {
-            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Enter your content here...', system: 'Create LinkedIn, Twitter, and Instagram versions.', prefix: 'Create posts:
+            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content here...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:
 
 ' },
-            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis.', prefix: 'Convert:
+            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post.', prefix: 'Convert to blog post:
 
 ' },
-            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog', placeholder: 'Paste transcript...', system: 'Convert to blog post.', prefix: 'Convert:
+            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste your content...', system: 'Create engaging newsletter with subject, greeting, CTA.', prefix: 'Create newsletter:
 
 ' },
-            'newsletter': { title: '📧 Newsletter', description: 'Create newsletter', placeholder: 'Paste content...', system: 'Create newsletter.', prefix: 'Create:
+            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Enter your content...', system: 'Create LinkedIn, Twitter, and Instagram versions.', prefix: 'Create social posts:
+
+' },
+            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes:
+
+' },
+            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps.', prefix: 'Create shownotes:
 
 ' }
         };
 
         const DEMO_OUTPUTS = {
-            'social-posts': '📱 LINKEDIN:
-Professional post here.
+            'blog-to-twitter': '🧵 Thread: 5 Tips
 
-🐦 TWITTER:
-Short tweet here.
+1/ 🎯 First tip
+2/ ✍️ Second tip
+3/ 📊 Third tip
 
-📸 INSTAGRAM:
-Visual post here.',
-            'blog-to-twitter': '🧵 Thread:
+Follow for more!',
+            'video-to-blog': '# Blog Post Title
 
-1/ First tweet
-2/ Second tweet
-3/ Third tweet',
-            'video-to-blog': '# Blog Post
-
-Introduction here.
+Introduction paragraph here.
 
 ## Key Points
 - Point 1
 - Point 2
 
 Conclusion.',
-            'newsletter': 'Subject: Newsletter
+            'newsletter': 'Subject: Weekly Update
 
 Hi there,
 
-Content here.
+Here is this week's content...
 
-Best regards'
+Best regards',
+            'social-posts': '📱 LINKEDIN:
+Professional post content.
+
+🐦 TWITTER:
+Short, punchy tweet.
+
+📸 INSTAGRAM:
+Visual-focused caption.',
+            'image-quotes': '"Quote 1" - Author
+
+"Quote 2" - Author
+
+"Quote 3" - Author',
+            'podcast-shownotes': '## Episode Summary
+
+Brief summary here.
+
+## Timestamps
+- 00:00 Intro
+- 05:30 Topic 1
+- 15:00 Topic 2'
         };
+
+        // Initialize
+        document.getElementById('stat-repurposes').textContent = localStorage.getItem('repurposes_used') || '0';
+        if (GROQ_API_KEY) document.getElementById('groq-api-key').value = GROQ_API_KEY;
+        document.getElementById('groq-model').value = GROQ_MODEL;
 
         function logout() { 
             if(confirm('Logout?')) { 
@@ -133,22 +228,54 @@ Best regards'
             } 
         }
 
+        function showSettings() {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('settings-view').classList.remove('hidden');
+        }
+
+        function showTab(tab, el) {
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById('settings-' + tab).classList.remove('hidden');
+            el.classList.add('active');
+        }
+
+        function applyTheme() {
+            const color = document.getElementById('theme-color').value;
+            document.documentElement.style.setProperty('--primary-color', color);
+            alert('Theme applied!');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('groq-api-key').value.trim();
+            const model = document.getElementById('groq-model').value;
+            if (key) {
+                GROQ_API_KEY = key;
+                GROQ_MODEL = model;
+                localStorage.setItem('groq_api_key', key);
+                localStorage.setItem('groq_model', model);
+                alert('API Key saved!');
+            } else {
+                alert('Please enter an API key');
+            }
+        }
+
         function openFeature(name) {
             const f = FEATURES[name];
             const div = document.createElement('div');
             div.innerHTML = `
-                <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+                <div id="modal" class="modal-overlay" onclick="if(event.target===this) closeModal()">
                     <div class="modal-content">
                         <button class="modal-close" onclick="closeModal()">✕</button>
-                        <h2 style="color: #667eea; margin-bottom: 0.5rem;">${f.title}</h2>
+                        <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">${f.title}</h2>
                         <p style="color: #666; margin-bottom: 1rem;">${f.description}</p>
-                        ${!GROQ_API_KEY ? '<div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><strong>⚡ Demo Mode</strong><br>Add Groq API key in Settings for AI generation, or use Demo Mode.</div>' : ''}
+                        ${!GROQ_API_KEY ? '<div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><strong>⚡ Demo Mode</strong><br>No API key set. Using demo outputs. Add your key in Settings.</div>' : ''}
                         <textarea id="input" class="input-area" placeholder="${f.placeholder}"></textarea>
                         <button onclick="generate('${name}')" id="gen-btn" class="btn" style="width: 100%;">✨ Generate</button>
                         <div id="result" class="result-box">
                             <div id="content" style="white-space: pre-wrap; line-height: 1.6; margin-bottom: 1rem;"></div>
-                            <button onclick="copy()" class="btn">📋 Copy</button>
-                            <button onclick="regenerate('${name}')" class="btn" style="background: white; color: #667eea; border: 2px solid #667eea;">🔄 Regenerate</button>
+                            <button onclick="copyResult()" class="btn">📋 Copy</button>
+                            <button onclick="regenerate('${name}')" class="btn btn-outline">🔄 Regenerate</button>
                         </div>
                         <div id="error-box" class="error-box"></div>
                     </div>
@@ -156,14 +283,17 @@ Best regards'
             document.body.appendChild(div);
         }
 
-        function closeModal() { 
+        function closeModal() {
             const modal = document.getElementById('modal');
-            if(modal) modal.remove(); 
+            if (modal) modal.remove();
         }
 
         async function generate(name) {
             const input = document.getElementById('input').value.trim();
-            if (!input) return alert('Enter content');
+            if (!input) {
+                alert('Please enter some content');
+                return;
+            }
 
             const f = FEATURES[name];
             const btn = document.getElementById('gen-btn');
@@ -178,7 +308,7 @@ Best regards'
             if (!GROQ_API_KEY) {
                 setTimeout(() => {
                     document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
-                    resultBox.style.display = 'block';
+                    resultBox.classList.add('show');
                     updateStats();
                     btn.innerHTML = '✨ Generate';
                     btn.disabled = false;
@@ -186,62 +316,63 @@ Best regards'
                 return;
             }
 
-            // AI mode (with Groq API)
+            // AI mode
             try {
-                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': 'Bearer ' + GROQ_API_KEY 
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + GROQ_API_KEY
                     },
-                    body: JSON.stringify({ 
-                        model: GROQ_MODEL, 
+                    body: JSON.stringify({
+                        model: GROQ_MODEL,
                         messages: [
-                            { role: 'system', content: f.system }, 
+                            { role: 'system', content: f.system },
                             { role: 'user', content: f.prefix + input }
-                        ], 
-                        temperature: 0.7, 
-                        max_tokens: 2000 
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 2000
                     })
                 });
 
-                const data = await res.json();
+                const data = await response.json();
 
-                if (!res.ok || data.error) {
+                if (!response.ok || data.error) {
                     throw new Error(data.error?.message || 'API error');
                 }
 
                 document.getElementById('content').textContent = data.choices[0].message.content;
-                resultBox.style.display = 'block';
+                resultBox.classList.add('show');
                 updateStats();
 
-            } catch(e) {
-                console.error('Error:', e);
-                errorBox.innerHTML = '<strong>Error:</strong> ' + e.message + '<br>Showing demo output.';
+            } catch (error) {
+                console.error('Error:', error);
+                errorBox.innerHTML = '<strong>Error:</strong> ' + error.message + '<br>Showing demo output.';
                 errorBox.style.display = 'block';
                 document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
-                resultBox.style.display = 'block';
+                resultBox.classList.add('show');
             }
 
             btn.innerHTML = '✨ Generate';
             btn.disabled = false;
         }
 
-        function regenerate(name) { generate(name); }
-
-        function copy() { 
-            const content = document.getElementById('content').textContent;
-            navigator.clipboard.writeText(content).then(() => alert('Copied!')); 
+        function regenerate(name) {
+            generate(name);
         }
 
-        function updateStats() { 
+        function copyResult() {
+            const content = document.getElementById('content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function updateStats() {
             const current = parseInt(localStorage.getItem('repurposes_used') || '0');
-            localStorage.setItem('repurposes_used', current + 1); 
+            localStorage.setItem('repurposes_used', current + 1);
             document.getElementById('stat-repurposes').textContent = current + 1;
         }
-
-        // Load stats on page load
-        document.getElementById('stat-repurposes').textContent = localStorage.getItem('repurposes_used') || '0';
     </script>
 </body>
 </html>
