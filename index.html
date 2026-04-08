@@ -3,325 +3,1226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RepurposeAI - Dashboard</title>
+    <title>RepurposeAI - Transform Your Content</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --primary-color: #667eea; --bg-color: #f8f9fa; --card-bg: white; --text-color: #2c3e50; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-        .navbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .navbar h1 { font-size: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .navbar-links { display: flex; align-items: center; gap: 0.5rem; }
-        .navbar a, .navbar button { color: var(--text-color); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 8px 16px; border-radius: 8px; transition: all 0.3s; font-weight: 500; }
-        .navbar a:hover, .navbar button:hover { background: var(--bg-color); color: var(--primary-color); }
-        .navbar button.logout { background: #fee; color: #e74c3c; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .btn { background: var(--primary-color); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; margin: 5px; font-weight: 500; transition: all 0.3s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
-        .btn-success { background: #27ae60; }
-        .btn-outline { background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); }
-        .hidden { display: none !important; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .stat { text-align: center; padding: 2rem 1.5rem; background: var(--card-bg); border-radius: 12px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .stat h3 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem; font-weight: 700; }
-        .welcome-hero { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; text-align: center; padding: 3rem 2rem; border-radius: 12px; }
-        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .feature-card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 2px solid transparent; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .feature-card:hover { border-color: var(--primary-color); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
-        .feature-card h4 { color: var(--primary-color); margin-bottom: 0.5rem; }
-        .settings-layout { display: flex; gap: 2rem; }
-        .settings-sidebar { width: 260px; background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); height: fit-content; position: sticky; top: 100px; }
-        .menu-item { padding: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; color: var(--text-color); transition: all 0.3s; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
-        .menu-item:hover { background: var(--bg-color); color: var(--primary-color); }
-        .menu-item.active { background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%); color: white; }
-        .settings-content { flex: 1; }
-        .settings-section { margin-bottom: 2rem; }
-        .settings-section h3 { margin-bottom: 1.5rem; color: var(--primary-color); font-size: 1.3rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-group input, .form-group select { padding: 0.75rem; border: 2px solid #e0e0e0; border-radius: 8px; width: 100%; max-width: 400px; font-size: 0.95rem; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
-        .modal-content { background: white; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
-        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-        .input-area { width: 100%; min-height: 150px; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 1rem; resize: vertical; margin-bottom: 1rem; }
-        .result-box { margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary-color); display: none; }
-        .result-box.show { display: block; }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .error-box { background: #fee; border: 1px solid #e74c3c; color: #c0392b; padding: 1rem; border-radius: 8px; margin-top: 1rem; display: none; }
-        .success-box { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
-        @media (max-width: 768px) { .settings-layout { flex-direction: column; } .settings-sidebar { width: 100%; position: static; } }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --bg: #0f172a;
+            --bg-elevated: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #475569;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 40px rgba(99, 102, 241, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            padding-left: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .upgrade-card {
+            margin-top: auto;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.15) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .upgrade-card h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .upgrade-card p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .btn-upgrade {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 32px 40px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-left h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .usage-widget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-elevated);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .usage-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            height: 100%;
+            width: 65%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .usage-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: var(--accent);
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Quick Actions Grid */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .tool-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: var(--shadow), var(--glow);
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .tool-card:hover .tool-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .tool-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .tool-icon.pink { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
+        .tool-icon.green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        .tool-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .tool-icon.orange { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); }
+        .tool-icon.cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+
+        .tool-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tool-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .tool-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tool-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .try-demo-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .tool-card:hover .try-demo-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .try-demo-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .view-all {
+            font-size: 13px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .view-all:hover {
+            color: var(--primary-light);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            transform: translateX(8px);
+            border-left: 3px solid var(--primary);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .activity-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .activity-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent);
+        }
+
+        .status-processing {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea.input-field {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .settings-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .select-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Demo Preview */
+        .demo-preview {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px dashed var(--border);
+        }
+
+        .demo-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .demo-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <nav class="navbar">
-        <h1>RepurposeAI</h1>
-        <div class="navbar-links">
-            <a href="index.html">Dashboard</a>
-            <a href="pricing.html">Pricing</a>
-            <button onclick="showSettings()">Settings</button>
-            <button onclick="logout()" class="logout">Logout</button>
-        </div>
-    </nav>
+    <div class="bg-animation"></div>
 
-    <div class="container">
-        <div id="dashboard-view">
-            <div class="card welcome-hero">
-                <h2>Welcome back! 👋</h2>
-                <p>Your current plan: <strong>Free</strong> (Powered by Groq AI)</p>
-            </div>
-
-            <div class="grid">
-                <div class="stat"><h3 id="stat-repurposes">0</h3><p>Repurposes Used</p></div>
-                <div class="stat"><h3>5</h3><p>Templates Available</p></div>
-                <div class="stat"><h3>∞</h3><p>Unlimited Credits</p></div>
-            </div>
-
-            <div class="card" style="margin-top: 2rem;">
-                <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
-                <button onclick="openFeature('blog-to-twitter')" class="btn">📝 Blog to Twitter</button>
-                <button onclick="openFeature('video-to-blog')" class="btn">🎥 Video to Blog</button>
-                <button onclick="openFeature('newsletter')" class="btn">📧 Newsletter</button>
-                <button onclick="openFeature('social-posts')" class="btn">📱 Social Posts</button>
-                <button onclick="openFeature('image-quotes')" class="btn">🎨 Image Quotes</button>
-                <button onclick="openFeature('podcast-shownotes')" class="btn">🎙️ Podcast Shownotes</button>
-            </div>
-            
-            <div class="feature-grid">
-                <div class="feature-card" onclick="openFeature('blog-to-twitter')"><h4>📝 Blog to Twitter</h4><p>Transform your blog posts into engaging Twitter threads</p></div>
-                <div class="feature-card" onclick="openFeature('video-to-blog')"><h4>🎥 Video to Blog</h4><p>Convert YouTube videos into well-structured blog articles</p></div>
-                <div class="feature-card" onclick="openFeature('newsletter')"><h4>📧 Newsletter</h4><p>Create email newsletters from your existing content</p></div>
-                <div class="feature-card" onclick="openFeature('social-posts')"><h4>📱 Social Posts</h4><p>Generate LinkedIn, Facebook, and Instagram posts</p></div>
-                <div class="feature-card" onclick="openFeature('image-quotes')"><h4>🎨 Image Quotes</h4><p>Create shareable quote images from your content</p></div>
-                <div class="feature-card" onclick="openFeature('podcast-shownotes')"><h4>🎙️ Podcast Shownotes</h4><p>Generate shownotes and summaries from podcast episodes</p></div>
-            </div>
-        </div>
-
-        <div id="settings-view" class="hidden">
-            <div class="settings-layout">
-                <div class="settings-sidebar">
-                    <div class="menu-item active" onclick="showTab('appearance', this)">🎨 Appearance</div>
-                    <div class="menu-item" onclick="showTab('account', this)">👤 Account</div>
-                    <div class="menu-item" onclick="showTab('api', this)">🔑 API Settings</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-sync-alt"></i>
                 </div>
-                
-                <div class="settings-content">
-                    <div id="settings-appearance" class="card settings-section">
-                        <h3>Appearance Settings</h3>
-                        <div class="form-group"><label>Theme Color</label><input type="color" id="theme-color" value="#667eea"></div>
-                        <button onclick="applyTheme()" class="btn">Apply Theme</button>
-                    </div>
+                <div class="logo-text">RepurposeAI</div>
+            </div>
 
-                    <div id="settings-account" class="card settings-section hidden">
-                        <h3>Account Settings</h3>
-                        <p>Email: <span id="user-email-display">user@example.com</span></p>
-                        <button onclick="logout()" class="btn" style="background: #e74c3c;">Logout</button>
-                    </div>
+            <div class="nav-section">
+                <div class="nav-label">Dashboard</div>
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-star"></i>
+                    <span>Saved</span>
+                </div>
+            </div>
 
-                    <div id="settings-api" class="card settings-section hidden">
-                        <h3>🔑 API Settings</h3>
-                        <div class="success-box">
-                            <strong>✅ Groq AI (Free Tier)</strong><br>
-                            <small>Get your free API key at console.groq.com</small>
+            <div class="nav-section">
+                <div class="nav-label">Tools</div>
+                <div class="nav-item">
+                    <i class="fas fa-blog"></i>
+                    <span>My Content</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Settings</div>
+                <div class="nav-item">
+                    <i class="fas fa-palette"></i>
+                    <span>Appearance</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Account</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>API Keys</span>
+                </div>
+            </div>
+
+            <div class="upgrade-card">
+                <h4>🚀 Upgrade to Pro</h4>
+                <p>Unlimited conversions & priority AI</p>
+                <button class="btn-upgrade">Upgrade $9/mo</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1>Transform your content in seconds</h1>
+                    <p>Join 2,000+ creators repurposing content with AI</p>
+                </div>
+                <div class="header-right">
+                    <div class="usage-widget">
+                        <span class="usage-text">65/100 used</span>
+                        <div class="usage-bar">
+                            <div class="usage-fill"></div>
                         </div>
-                        <div class="form-group">
-                            <label>Groq API Key</label>
-                            <input type="password" id="groq-api-key" placeholder="gsk_...">
-                        </div>
-                        <div class="form-group">
-                            <label>Model</label>
-                            <select id="groq-model">
-                                <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
-                                <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
-                            </select>
-                        </div>
-                        <button onclick="saveApiKey()" class="btn btn-success">💾 Save API Key</button>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
                     </div>
                 </div>
+            </header>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-label">Conversions</div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-change">↑ 12% this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Time Saved</div>
+                    <div class="stat-value">18h</div>
+                    <div class="stat-change">↑ 24% this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Characters</div>
+                    <div class="stat-value">45.2K</div>
+                    <div class="stat-change">↑ 8% this week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-value">5🔥</div>
+                    <div class="stat-change">Keep it up!</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <h2 class="section-title">
+                <i class="fas fa-bolt" style="color: var(--primary);"></i>
+                Quick Actions
+            </h2>
+
+            <div class="tools-grid">
+                <div class="tool-card" onclick="openModal('blog-to-twitter')">
+                    <div class="tool-icon blue">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <div class="tool-title">Blog → Twitter</div>
+                    <div class="tool-desc">Transform blog posts into engaging Twitter threads with hooks and CTAs</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 30s</span>
+                        <span><i class="fas fa-fire"></i> Popular</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+
+                <div class="tool-card" onclick="openModal('video-to-blog')">
+                    <div class="tool-icon pink">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <div class="tool-title">Video → Blog</div>
+                    <div class="tool-desc">Convert YouTube videos into well-structured, SEO-optimized blog articles</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 2min</span>
+                        <span><i class="fas fa-star"></i> 4.9★</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+
+                <div class="tool-card" onclick="openModal('newsletter')">
+                    <div class="tool-icon green">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="tool-title">Newsletter</div>
+                    <div class="tool-desc">Create compelling email newsletters from your existing content</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 45s</span>
+                        <span><i class="fas fa-check"></i> Pro</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+
+                <div class="tool-card" onclick="openModal('social-posts')">
+                    <div class="tool-icon purple">
+                        <i class="fas fa-share-nodes"></i>
+                    </div>
+                    <div class="tool-title">Social Posts</div>
+                    <div class="tool-desc">Generate LinkedIn, Facebook, and Instagram posts from one source</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 20s</span>
+                        <span><i class="fas fa-layer-group"></i> 3-in-1</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+
+                <div class="tool-card" onclick="openModal('image-quotes')">
+                    <div class="tool-icon orange">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="tool-title">Image Quotes</div>
+                    <div class="tool-desc">Create shareable quote images optimized for each platform</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 15s</span>
+                        <span><i class="fas fa-wand-magic-sparkles"></i> AI Gen</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+
+                <div class="tool-card" onclick="openModal('podcast-shownotes')">
+                    <div class="tool-icon cyan">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="tool-title">Podcast Shownotes</div>
+                    <div class="tool-desc">Generate timestamps, summaries and key takeaways from episodes</div>
+                    <div class="tool-meta">
+                        <span><i class="fas fa-clock"></i> 3min</span>
+                        <span><i class="fas fa-headphones"></i> Audio</span>
+                    </div>
+                    <button class="try-demo-btn">Try Demo →</button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <div class="activity-header">
+                    <h3 class="section-title" style="margin: 0;">
+                        <i class="fas fa-clock-rotate-left" style="color: var(--secondary);"></i>
+                        Recent Activity
+                    </h3>
+                    <span class="view-all">View All →</span>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">
+                            <i class="fab fa-twitter"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Blog → Twitter Thread</div>
+                            <div class="activity-meta">"10 AI Tools for Content Creators" • 2 hours ago</div>
+                        </div>
+                        <span class="activity-status status-completed">Completed</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Video → Blog Article</div>
+                            <div class="activity-meta">"How to Grow on LinkedIn" • 5 hours ago</div>
+                        </div>
+                        <span class="activity-status status-completed">Completed</span>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Weekly Newsletter</div>
+                            <div class="activity-meta">"This Week in AI" • Processing...</div>
+                        </div>
+                        <span class="activity-status status-processing">Processing</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Convert Content</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Input Content</label>
+                    <textarea class="input-field" id="modal-input" placeholder="Paste your content here, or enter a URL..."></textarea>
+                </div>
+
+                <div class="demo-preview" id="demo-preview" style="display: none;">
+                    <div class="demo-label">Preview Output</div>
+                    <div class="demo-content" id="demo-content">
+                        Your converted content will appear here...
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <div>
+                        <label class="input-label">Tone</label>
+                        <select class="select-field">
+                            <option>Professional</option>
+                            <option>Casual</option>
+                            <option>Witty</option>
+                            <option>Inspirational</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="input-label">Length</label>
+                        <select class="select-field">
+                            <option>Short</option>
+                            <option selected>Medium</option>
+                            <option>Long</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div>
+                        <label class="input-label">Language</label>
+                        <select class="select-field">
+                            <option>English</option>
+                            <option>Spanish</option>
+                            <option>French</option>
+                            <option>German</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="input-label">Style</label>
+                        <select class="select-field">
+                            <option>Standard</option>
+                            <option>Minimalist</option>
+                            <option>Detailed</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="loadDemo()">Load Demo</button>
+                <button class="btn btn-primary" onclick="convertContent()">
+                    <i class="fas fa-magic"></i> Convert Now
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div>
+            <div style="font-weight: 600;">Success!</div>
+            <div style="font-size: 13px; color: var(--text-secondary);">Content converted successfully</div>
+        </div>
+    </div>
+
     <script>
-        // Configuration
-        let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
-        let GROQ_MODEL = localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile';
-        
-        const FEATURES = {
-            'blog-to-twitter': { title: '📝 Blog to Twitter', description: 'Convert blog content to Twitter thread', placeholder: 'Paste blog content...', system: 'Convert to Twitter thread with emojis, under 280 chars per tweet.', prefix: 'Convert to Twitter thread:\n\n' },
-            'video-to-blog': { title: '🎥 Video to Blog', description: 'Convert video to blog article', placeholder: 'Paste video transcript...', system: 'Convert video content to well-structured blog post.', prefix: 'Convert to blog post:\n\n' },
-            'newsletter': { title: '📧 Newsletter', description: 'Create email newsletter', placeholder: 'Paste content...', system: 'Create engaging newsletter with subject, greeting, CTA.', prefix: 'Create newsletter:\n\n' },
-            'social-posts': { title: '📱 Social Posts', description: 'Generate social media posts', placeholder: 'Enter content...', system: 'Create LinkedIn, Twitter, and Instagram versions.', prefix: 'Create social posts:\n\n' },
-            'image-quotes': { title: '🎨 Image Quotes', description: 'Generate shareable quotes', placeholder: 'Paste content...', system: 'Extract 5 inspiring quotes under 100 characters each.', prefix: 'Create quotes:\n\n' },
-            'podcast-shownotes': { title: '🎙️ Podcast Shownotes', description: 'Generate podcast shownotes', placeholder: 'Paste transcript...', system: 'Create professional shownotes with summary, timestamps.', prefix: 'Create shownotes:\n\n' }
-        };
-
-        const DEMO_OUTPUTS = {
-            'blog-to-twitter': '🧵 Thread: 5 Tips\n\n1/ 🎯 First tip\n2/ ✍️ Second tip\n3/ 📊 Third tip\n\nFollow for more!',
-            'video-to-blog': '# Blog Post Title\n\nIntroduction paragraph here.\n\n## Key Points\n- Point 1\n- Point 2\n\nConclusion.',
-            'newsletter': 'Subject: Weekly Update\n\nHi there,\n\nHere is this week\'s content...\n\nBest regards',
-            'social-posts': '📱 LINKEDIN:\nProfessional post content.\n\n🐦 TWITTER:\nShort, punchy tweet.\n\n📸 INSTAGRAM:\nVisual-focused caption.',
-            'image-quotes': '"Quote 1" - Author\n\n"Quote 2" - Author\n\n"Quote 3" - Author',
-            'podcast-shownotes': '## Episode Summary\n\nBrief summary here.\n\n## Timestamps\n- 00:00 Intro\n- 05:30 Topic 1\n- 15:00 Topic 2'
-        };
-
-        // Initialize
-        document.getElementById('stat-repurposes').textContent = localStorage.getItem('repurposes_used') || '0';
-        if (GROQ_API_KEY) document.getElementById('groq-api-key').value = GROQ_API_KEY;
-        document.getElementById('groq-model').value = GROQ_MODEL;
-
-        function logout() { 
-            if(confirm('Logout?')) { 
-                localStorage.clear(); 
-                window.location.href = 'login.html'; 
-            } 
-        }
-
-        function showSettings() {
-            document.getElementById('dashboard-view').classList.add('hidden');
-            document.getElementById('settings-view').classList.remove('hidden');
-        }
-
-        function showTab(tab, el) {
-            document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            document.getElementById('settings-' + tab).classList.remove('hidden');
-            el.classList.add('active');
-        }
-
-        function applyTheme() {
-            const color = document.getElementById('theme-color').value;
-            document.documentElement.style.setProperty('--primary-color', color);
-            alert('Theme applied!');
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('groq-api-key').value.trim();
-            const model = document.getElementById('groq-model').value;
-            if (key) {
-                GROQ_API_KEY = key;
-                GROQ_MODEL = model;
-                localStorage.setItem('groq_api_key', key);
-                localStorage.setItem('groq_model', model);
-                alert('API Key saved!');
-            } else {
-                alert('Please enter an API key');
+        const demoContent = {
+            'blog-to-twitter': {
+                title: 'Blog → Twitter Thread',
+                input: '10 AI Tools That Will 10x Your Content Creation Workflow in 2024. Artificial intelligence is revolutionizing how creators work...',
+                output: '🧵 10 AI Tools That Will 10x Your Content Creation Workflow in 2024\n\n1/ @RepurposeAI - Turn blogs into Twitter threads instantly\n\n2/ @Midjourney - Create stunning visuals\n\n3/ @CopyAI - Write faster, better copy\n\n👇 Thread continues'
+            },
+            'video-to-blog': {
+                title: 'Video → Blog Article',
+                input: 'https://youtube.com/watch?v=example',
+                output: 'How to Build a Personal Brand on LinkedIn in 2024\n\nKey Takeaways:\n• Optimize your headline with keywords\n• Post consistently (3x per week)\n• Engage with comments within 1 hour\n• Use native video for 5x more reach'
+            },
+            'newsletter': {
+                title: 'Create Newsletter',
+                input: 'Weekly roundup of AI news and tools...',
+                output: 'Subject: This Week in AI: Major Updates You Can't Miss\n\nHi [Name],\n\nHere's what happened this week in AI...'
+            },
+            'social-posts': {
+                title: 'Generate Social Posts',
+                input: 'New product launch announcement...',
+                output: 'LinkedIn: Excited to announce...\n\nTwitter: Big news! 🚀...\n\nInstagram: New launch alert ✨...'
+            },
+            'image-quotes': {
+                title: 'Create Image Quotes',
+                input: 'Success is not final, failure is not fatal...',
+                output: '[Visual Quote Card Generated]\n\nDesign: Minimalist black text on gradient background\nSize: 1080x1080 (Instagram optimized)'
+            },
+            'podcast-shownotes': {
+                title: 'Podcast Shownotes',
+                input: 'Episode 45: Interview with CEO...',
+                output: 'Episode 45: Building a $10M SaaS Business\n\nTimestamps:\n00:00 - Intro\n05:32 - Early struggles\n12:45 - Breakthrough moment\n28:20 - Key advice for founders'
             }
-        }
+        };
 
-        function openFeature(name) {
-            const f = FEATURES[name];
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <div id="modal" class="modal-overlay" onclick="if(event.target===this) closeModal()">
-                    <div class="modal-content">
-                        <button class="modal-close" onclick="closeModal()">✕</button>
-                        <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">${f.title}</h2>
-                        <p style="color: #666; margin-bottom: 1rem;">${f.description}</p>
-                        ${!GROQ_API_KEY ? '<div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"><strong>⚡ Demo Mode</strong><br>No API key set. Using demo outputs. Add your key in Settings.</div>' : ''}
-                        <textarea id="input" class="input-area" placeholder="${f.placeholder}"></textarea>
-                        <button onclick="generate('${name}')" id="gen-btn" class="btn" style="width: 100%;">✨ Generate</button>
-                        <div id="result" class="result-box">
-                            <div id="content" style="white-space: pre-wrap; line-height: 1.6; margin-bottom: 1rem;"></div>
-                            <button onclick="copyResult()" class="btn">📋 Copy</button>
-                            <button onclick="regenerate('${name}')" class="btn btn-outline">🔄 Regenerate</button>
-                        </div>
-                        <div id="error-box" class="error-box"></div>
-                    </div>
-                </div>`;
-            document.body.appendChild(div);
+        let currentTool = '';
+
+        function openModal(tool) {
+            currentTool = tool;
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const input = document.getElementById('modal-input');
+            const preview = document.getElementById('demo-preview');
+
+            title.textContent = demoContent[tool].title;
+            input.value = '';
+            input.placeholder = 'Paste your content here, or enter a URL...';
+            preview.style.display = 'none';
+
+            modal.classList.add('active');
         }
 
         function closeModal() {
-            const modal = document.getElementById('modal');
-            if (modal) modal.remove();
+            document.getElementById('modal').classList.remove('active');
         }
 
-        async function generate(name) {
-            const input = document.getElementById('input').value.trim();
-            if (!input) {
-                alert('Please enter some content');
-                return;
+        function loadDemo() {
+            const input = document.getElementById('modal-input');
+            const preview = document.getElementById('demo-preview');
+            const content = document.getElementById('demo-content');
+
+            input.value = demoContent[currentTool].input;
+            content.textContent = demoContent[currentTool].output;
+            preview.style.display = 'block';
+        }
+
+        function convertContent() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                closeModal();
+            }, 2000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
             }
-            
-            const f = FEATURES[name];
-            const btn = document.getElementById('gen-btn');
-            const resultBox = document.getElementById('result');
-            const errorBox = document.getElementById('error-box');
-            
-            btn.innerHTML = '<span class="loading-spinner"></span>Generating...';
-            btn.disabled = true;
-            errorBox.style.display = 'none';
-            
-            // Demo mode (no API key)
-            if (!GROQ_API_KEY) {
+        });
+
+        // Animate stats on load
+        window.addEventListener('load', () => {
+            const stats = document.querySelectorAll('.stat-value');
+            stats.forEach(stat => {
+                const finalValue = stat.textContent;
+                stat.textContent = '0';
                 setTimeout(() => {
-                    document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
-                    resultBox.classList.add('show');
-                    updateStats();
-                    btn.innerHTML = '✨ Generate';
-                    btn.disabled = false;
-                }, 1000);
-                return;
-            }
-            
-            // AI mode
-            try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + GROQ_API_KEY
-                    },
-                    body: JSON.stringify({
-                        model: GROQ_MODEL,
-                        messages: [
-                            { role: 'system', content: f.system },
-                            { role: 'user', content: f.prefix + input }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 2000
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok || data.error) {
-                    throw new Error(data.error?.message || 'API error');
-                }
-                
-                document.getElementById('content').textContent = data.choices[0].message.content;
-                resultBox.classList.add('show');
-                updateStats();
-                
-            } catch (error) {
-                console.error('Error:', error);
-                errorBox.innerHTML = '<strong>Error:</strong> ' + error.message + '<br>Showing demo output.';
-                errorBox.style.display = 'block';
-                document.getElementById('content').textContent = DEMO_OUTPUTS[name] || 'Sample output';
-                resultBox.classList.add('show');
-            }
-            
-            btn.innerHTML = '✨ Generate';
-            btn.disabled = false;
-        }
-
-        function regenerate(name) {
-            generate(name);
-        }
-
-        function copyResult() {
-            const content = document.getElementById('content').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                alert('Copied to clipboard!');
+                    stat.textContent = finalValue;
+                }, 300);
             });
-        }
-
-        function updateStats() {
-            const current = parseInt(localStorage.getItem('repurposes_used') || '0');
-            localStorage.setItem('repurposes_used', current + 1);
-            document.getElementById('stat-repurposes').textContent = current + 1;
-        }
+        });
     </script>
 </body>
 </html>
