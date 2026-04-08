@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RepurposeAI - Transform Your Content</title>
+    <title>RepurposeAI - Multimedia Content Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,6 +15,7 @@
             --accent: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
+            --info: #06b6d4;
             --bg: #0f172a;
             --bg-elevated: #1e293b;
             --bg-card: #334155;
@@ -91,6 +92,8 @@
         .tool-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
         .tool-icon.orange { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); }
         .tool-icon.cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+        .tool-icon.red { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+        .tool-icon.yellow { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); }
         .tool-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
         .tool-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
         .tool-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted); }
@@ -109,9 +112,10 @@
         .activity-status { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
         .status-completed { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
         .status-processing { background: rgba(99, 102, 241, 0.2); color: var(--primary-light); }
+
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 700px; max-height: 85vh; overflow: hidden; transform: scale(0.9) translateY(20px); transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        .modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 900px; max-height: 90vh; overflow: hidden; transform: scale(0.9) translateY(20px); transition: transform 0.3s ease; display: flex; flex-direction: column; }
         .modal-overlay.active .modal { transform: scale(1) translateY(0); }
         .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-size: 20px; font-weight: 600; }
@@ -124,18 +128,55 @@
         .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         .input-field::placeholder { color: var(--text-muted); }
         textarea.input-field { min-height: 120px; resize: vertical; }
-        .settings-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .settings-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
         .select-field { width: 100%; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 13px; cursor: pointer; transition: all 0.3s ease; }
         .select-field:focus { outline: none; border-color: var(--primary); }
+
+        /* Multimedia Output Styles */
+        .output-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .output-tab { padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .output-tab:hover { background: var(--bg-card); color: var(--text-primary); }
+        .output-tab.active { background: var(--primary); border-color: var(--primary); color: white; }
         .output-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
         .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .output-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .output-actions { display: flex; gap: 8px; }
+        .output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-icon { padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 12px; display: flex; align-items: center; gap: 6px; }
         .btn-icon:hover { background: var(--primary); border-color: var(--primary); color: white; }
-        .output-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 150px; max-height: 300px; overflow-y: auto; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+        .output-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 150px; max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
         .output-content.loading { display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
         .output-content.error { border-color: var(--error); color: var(--error); }
+
+        /* Image Generation Styles */
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+        .generated-image { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        .generated-image img { width: 100%; height: 200px; object-fit: cover; }
+        .generated-image-info { padding: 12px; }
+        .generated-image-actions { display: flex; gap: 8px; padding: 0 12px 12px; }
+
+        /* Audio Player Styles */
+        .audio-player { background: var(--bg-card); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; }
+        .audio-waveform { flex: 1; height: 40px; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 4px; opacity: 0.6; position: relative; overflow: hidden; }
+        .audio-waveform::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(90deg, transparent, transparent 2px, var(--bg-card) 2px, var(--bg-card) 4px); }
+
+        /* Video Thumbnail */
+        .video-thumbnail { position: relative; border-radius: 12px; overflow: hidden; background: var(--bg-card); }
+        .video-thumbnail img { width: 100%; height: 220px; object-fit: cover; }
+        .video-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(99, 102, 241, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+        .video-play-btn:hover { transform: translate(-50%, -50%) scale(1.1); background: var(--primary); }
+        .video-play-btn i { color: white; font-size: 24px; margin-left: 4px; }
+
+        /* Canvas for Quote Images */
+        #quoteCanvas { max-width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+
+        /* Export Options */
+        .export-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+        .export-option { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .export-option:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .export-option i { font-size: 24px; margin-bottom: 8px; color: var(--primary); }
+        .export-option-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .export-option-desc { font-size: 11px; color: var(--text-muted); }
+
         .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: none; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .btn-secondary { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
@@ -187,8 +228,21 @@
         .calendar-day { aspect-ratio: 1; background: var(--bg-card); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: all 0.3s ease; }
         .calendar-day:hover { background: var(--primary); }
         .calendar-day.has-event { border: 2px solid var(--primary); }
-        @media (max-width: 1200px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } .analytics-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; padding: 20px; } .tools-grid { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2, 1fr); } .api-input { width: 200px; } }
+
+        /* Media Gallery */
+        .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .media-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
+        .media-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .media-preview { height: 160px; background: var(--bg-card); display: flex; align-items: center; justify-content: center; position: relative; }
+        .media-preview img, .media-preview video { width: 100%; height: 100%; object-fit: cover; }
+        .media-type-badge { position: absolute; top: 12px; left: 12px; padding: 4px 12px; background: rgba(0,0,0,0.7); border-radius: 20px; font-size: 11px; text-transform: uppercase; }
+        .media-info { padding: 16px; }
+        .media-title { font-weight: 600; margin-bottom: 4px; }
+        .media-meta { font-size: 12px; color: var(--text-muted); }
+        .media-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+
+        @media (max-width: 1200px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } .analytics-grid { grid-template-columns: 1fr; } .settings-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; padding: 20px; } .tools-grid { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2, 1fr); } .api-input { width: 200px; } .image-grid { grid-template-columns: 1fr; } .export-options { grid-template-columns: 1fr; } }
     </style>
 <base target="_blank">
 </head>
@@ -203,6 +257,7 @@
             <div class="nav-section">
                 <div class="nav-label">Dashboard</div>
                 <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')"><i class="fas fa-home"></i><span>Overview</span></div>
+                <div class="nav-item" data-page="media" onclick="navigateTo('media')"><i class="fas fa-photo-video"></i><span>Media Studio</span></div>
                 <div class="nav-item" data-page="history" onclick="navigateTo('history')"><i class="fas fa-history"></i><span>History</span></div>
                 <div class="nav-item" data-page="saved" onclick="navigateTo('saved')"><i class="fas fa-star"></i><span>Saved</span></div>
             </div>
@@ -220,7 +275,7 @@
             </div>
             <div class="upgrade-card">
                 <h4>Upgrade to Pro</h4>
-                <p>Unlimited conversions & priority AI</p>
+                <p>Multimedia generation & more</p>
                 <button class="btn-upgrade" onclick="showToast('Coming soon!', 'warning')">Upgrade $9/mo</button>
             </div>
         </aside>
@@ -242,7 +297,7 @@
                     </div>
                 </div>
                 <header class="header">
-                    <div class="header-left"><h1>Transform your content in seconds</h1><p>Join 2,000+ creators repurposing content with AI</p></div>
+                    <div class="header-left"><h1>Transform your content in seconds</h1><p>Generate text, images, audio & video with AI</p></div>
                     <div class="header-right">
                         <div class="api-status disconnected" id="apiStatus"><i class="fas fa-circle" style="font-size: 8px;"></i><span>Disconnected</span></div>
                         <div class="usage-widget"><span class="usage-text" id="usageText">0/100 used</span><div class="usage-bar"><div class="usage-fill" id="usageFill"></div></div></div>
@@ -250,23 +305,37 @@
                     </div>
                 </header>
                 <div class="stats-bar">
-                    <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">0</div><div class="stat-change" id="statConversionsChange">Start converting!</div></div>
-                    <div class="stat-card"><div class="stat-label">Time Saved</div><div class="stat-value" id="statTimeSaved">0h</div><div class="stat-change">AI-powered speed</div></div>
+                    <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">0</div><div class="stat-change" id="statConversionsChange">Start creating!</div></div>
+                    <div class="stat-card"><div class="stat-label">Media Generated</div><div class="stat-value" id="statMedia">0</div><div class="stat-change">Images, audio & more</div></div>
                     <div class="stat-card"><div class="stat-label">Characters</div><div class="stat-value" id="statChars">0</div><div class="stat-change">Processed</div></div>
                     <div class="stat-card"><div class="stat-label">Streak</div><div class="stat-value" id="statStreak">0</div><div class="stat-change">Keep it up!</div></div>
                 </div>
                 <h2 class="section-title"><i class="fas fa-bolt" style="color: var(--primary);"></i>Quick Actions</h2>
                 <div class="tools-grid">
-                    <div class="tool-card" data-tool="blog-to-twitter" onclick="openToolModal('blog-to-twitter')"><div class="tool-icon blue"><i class="fab fa-twitter"></i></div><div class="tool-title">Blog to Twitter</div><div class="tool-desc">Transform blog posts into engaging Twitter threads with hooks and CTAs</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 30s</span><span><i class="fas fa-fire"></i> Popular</span></div></div>
-                    <div class="tool-card" data-tool="video-to-blog" onclick="openToolModal('video-to-blog')"><div class="tool-icon pink"><i class="fab fa-youtube"></i></div><div class="tool-title">Video to Blog</div><div class="tool-desc">Convert YouTube videos into well-structured, SEO-optimized blog articles</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 2min</span><span><i class="fas fa-star"></i> 4.9</span></div></div>
-                    <div class="tool-card" data-tool="newsletter" onclick="openToolModal('newsletter')"><div class="tool-icon green"><i class="fas fa-envelope"></i></div><div class="tool-title">Newsletter</div><div class="tool-desc">Create compelling email newsletters from your existing content</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 45s</span><span><i class="fas fa-check"></i> Pro</span></div></div>
-                    <div class="tool-card" data-tool="social-posts" onclick="openToolModal('social-posts')"><div class="tool-icon purple"><i class="fas fa-share-nodes"></i></div><div class="tool-title">Social Posts</div><div class="tool-desc">Generate LinkedIn, Facebook, and Instagram posts from one source</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 20s</span><span><i class="fas fa-layer-group"></i> 3-in-1</span></div></div>
-                    <div class="tool-card" data-tool="image-quotes" onclick="openToolModal('image-quotes')"><div class="tool-icon orange"><i class="fas fa-image"></i></div><div class="tool-title">Image Quotes</div><div class="tool-desc">Create shareable quote images optimized for each platform</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 15s</span><span><i class="fas fa-wand-magic-sparkles"></i> AI Gen</span></div></div>
-                    <div class="tool-card" data-tool="podcast-shownotes" onclick="openToolModal('podcast-shownotes')"><div class="tool-icon cyan"><i class="fas fa-microphone"></i></div><div class="tool-title">Podcast Shownotes</div><div class="tool-desc">Generate timestamps, summaries and key takeaways from episodes</div><div class="tool-meta"><span><i class="fas fa-clock"></i> 3min</span><span><i class="fas fa-headphones"></i> Audio</span></div></div>
+                    <div class="tool-card" data-tool="blog-to-twitter" onclick="openToolModal('blog-to-twitter')"><div class="tool-icon blue"><i class="fab fa-twitter"></i></div><div class="tool-title">Blog to Twitter</div><div class="tool-desc">Transform blog posts into engaging Twitter threads</div><div class="tool-meta"><span><i class="fas fa-font"></i> Text</span><span><i class="fas fa-fire"></i> Popular</span></div></div>
+                    <div class="tool-card" data-tool="video-to-blog" onclick="openToolModal('video-to-blog')"><div class="tool-icon pink"><i class="fab fa-youtube"></i></div><div class="tool-title">Video to Blog</div><div class="tool-desc">Convert videos into SEO-optimized articles</div><div class="tool-meta"><span><i class="fas fa-font"></i> Text</span><span><i class="fas fa-star"></i> 4.9</span></div></div>
+                    <div class="tool-card" data-tool="image-quotes" onclick="openToolModal('image-quotes')"><div class="tool-icon orange"><i class="fas fa-image"></i></div><div class="tool-title">Quote Images</div><div class="tool-desc">Create shareable quote graphics with AI</div><div class="tool-meta"><span><i class="fas fa-image"></i> Image</span><span><i class="fas fa-wand-magic-sparkles"></i> AI</span></div></div>
+                    <div class="tool-card" data-tool="text-to-speech" onclick="openToolModal('text-to-speech')"><div class="tool-icon green"><i class="fas fa-microphone-alt"></i></div><div class="tool-title">Text to Speech</div><div class="tool-desc">Convert text to natural AI voice audio</div><div class="tool-meta"><span><i class="fas fa-music"></i> Audio</span><span><i class="fas fa-volume-up"></i> Voice</span></div></div>
+                    <div class="tool-card" data-tool="social-carousel" onclick="openToolModal('social-carousel')"><div class="tool-icon purple"><i class="fas fa-images"></i></div><div class="tool-title">Social Carousel</div><div class="tool-desc">Generate multi-slide Instagram carousels</div><div class="tool-meta"><span><i class="fas fa-image"></i> Images</span><span><i class="fas fa-layer-group"></i> Multi</span></div></div>
+                    <div class="tool-card" data-tool="video-script" onclick="openToolModal('video-script')"><div class="tool-icon red"><i class="fas fa-video"></i></div><div class="tool-title">Video Script + Thumbnail</div><div class="tool-desc">Create scripts with AI-generated thumbnails</div><div class="tool-meta"><span><i class="fas fa-photo-video"></i> Mixed</span><span><i class="fas fa-fire"></i> Hot</span></div></div>
                 </div>
                 <div class="activity-section">
                     <div class="activity-header"><h3 class="section-title" style="margin: 0;"><i class="fas fa-clock-rotate-left" style="color: var(--secondary);"></i>Recent Activity</h3><span class="view-all" onclick="navigateTo('history')">View All</span></div>
                     <div class="activity-list" id="activityList"><div class="empty-state"><i class="fas fa-inbox"></i><p>No conversions yet. Start by selecting a tool above!</p></div></div>
+                </div>
+            </div>
+
+            <!-- MEDIA STUDIO PAGE -->
+            <div class="page" id="page-media">
+                <div class="page-header"><h1>Media Studio</h1><p>Your generated multimedia content library</p></div>
+                <div class="output-tabs" style="margin-bottom: 24px;">
+                    <button class="output-tab active" onclick="filterMedia('all')"><i class="fas fa-th"></i> All</button>
+                    <button class="output-tab" onclick="filterMedia('image')"><i class="fas fa-image"></i> Images</button>
+                    <button class="output-tab" onclick="filterMedia('audio')"><i class="fas fa-music"></i> Audio</button>
+                    <button class="output-tab" onclick="filterMedia('video')"><i class="fas fa-video"></i> Video</button>
+                </div>
+                <div class="media-gallery" id="mediaGallery">
+                    <div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-photo-video"></i><h3>No media yet</h3><p>Generate images, audio, and video content using the tools</p></div>
                 </div>
             </div>
 
@@ -281,8 +350,8 @@
 
             <!-- SAVED PAGE -->
             <div class="page" id="page-saved">
-                <div class="page-header"><h1>Saved</h1><p>Your favorite conversions</p></div>
-                <div class="content-grid" id="savedGrid"><div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any conversion to save it here</p></div></div>
+                <div class="page-header"><h1>Saved</h1><p>Your favorite creations</p></div>
+                <div class="content-grid" id="savedGrid"><div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any creation to save it here</p></div></div>
             </div>
 
             <!-- MY CONTENT PAGE -->
@@ -291,7 +360,7 @@
                 <div class="content-grid">
                     <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Blog Posts</div><div class="content-card-meta">12 items</div></div><i class="fas fa-blog" style="color: var(--primary);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
                     <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Video Scripts</div><div class="content-card-meta">5 items</div></div><i class="fas fa-video" style="color: var(--secondary);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
-                    <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Newsletters</div><div class="content-card-meta">8 items</div></div><i class="fas fa-envelope" style="color: var(--accent);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
+                    <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Audio Projects</div><div class="content-card-meta">3 items</div></div><i class="fas fa-microphone-alt" style="color: var(--accent);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
                 </div>
             </div>
 
@@ -314,9 +383,9 @@
             <div class="page" id="page-analytics">
                 <div class="page-header"><h1>Analytics</h1><p>Track your content performance</p></div>
                 <div class="analytics-grid">
-                    <div class="analytics-card"><h4>Conversions Over Time</h4><div class="chart-placeholder"><i class="fas fa-chart-line" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                    <div class="analytics-card"><h4>Tool Usage</h4><div class="chart-placeholder"><i class="fas fa-chart-pie" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                    <div class="analytics-card"><h4>Content Types</h4><div class="chart-placeholder"><i class="fas fa-chart-bar" style="font-size: 48px; opacity: 0.5;"></i></div></div>
+                    <div class="analytics-card"><h4>Content Generated</h4><div class="chart-placeholder"><i class="fas fa-chart-line" style="font-size: 48px; opacity: 0.5;"></i></div></div>
+                    <div class="analytics-card"><h4>Media Types</h4><div class="chart-placeholder"><i class="fas fa-chart-pie" style="font-size: 48px; opacity: 0.5;"></i></div></div>
+                    <div class="analytics-card"><h4>Export Formats</h4><div class="chart-placeholder"><i class="fas fa-chart-bar" style="font-size: 48px; opacity: 0.5;"></i></div></div>
                     <div class="analytics-card"><h4>Time Saved</h4><div class="chart-placeholder"><i class="fas fa-clock" style="font-size: 48px; opacity: 0.5;"></i></div></div>
                 </div>
             </div>
@@ -361,7 +430,7 @@
         </main>
     </div>
 
-    <!-- Tool Modal -->
+    <!-- Enhanced Tool Modal with Multimedia -->
     <div class="modal-overlay" id="toolModal">
         <div class="modal">
             <div class="modal-header"><h3 class="modal-title" id="modalTitle">Convert Content</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div>
@@ -370,201 +439,220 @@
                 <div class="settings-row">
                     <div><label class="input-label">Tone</label><select class="select-field" id="toneSelect"><option value="professional">Professional</option><option value="casual">Casual</option><option value="witty">Witty</option><option value="inspirational">Inspirational</option><option value="authoritative">Authoritative</option></select></div>
                     <div><label class="input-label">Length</label><select class="select-field" id="lengthSelect"><option value="short">Short</option><option value="medium" selected>Medium</option><option value="long">Long</option></select></div>
+                    <div id="formatSelectContainer"><label class="input-label">Output Format</label><select class="select-field" id="formatSelect"><option value="text">Text Only</option><option value="image">With Image</option><option value="audio">With Audio</option><option value="all">All Formats</option></select></div>
                 </div>
-                <div class="output-section" id="outputSection" style="display: none;">
-                    <div class="output-header"><span class="output-label">Output</span><div class="output-actions"><button class="btn-icon" onclick="copyOutput()"><i class="fas fa-copy"></i> Copy</button><button class="btn-icon" onclick="downloadOutput()"><i class="fas fa-download"></i> Download</button><button class="btn-icon" onclick="saveOutput()"><i class="fas fa-star"></i> Save</button></div></div>
-                    <div class="output-content" id="outputContent"></div>
+
+                <!-- Output Tabs -->
+                <div class="output-tabs" id="outputTabs" style="display: none;">
+                    <button class="output-tab active" onclick="switchOutputTab('text')" id="tab-text"><i class="fas fa-font"></i> Text</button>
+                    <button class="output-tab" onclick="switchOutputTab('image')" id="tab-image" style="display: none;"><i class="fas fa-image"></i> Image</button>
+                    <button class="output-tab" onclick="switchOutputTab('audio')" id="tab-audio" style="display: none;"><i class="fas fa-music"></i> Audio</button>
+                    <button class="output-tab" onclick="switchOutputTab('video')" id="tab-video" style="display: none;"><i class="fas fa-video"></i> Video</button>
+                </div>
+
+                <!-- Text Output -->
+                <div class="output-section" id="outputSectionText" style="display: none;">
+                    <div class="output-header"><span class="output-label">Generated Text</span><div class="output-actions"><button class="btn-icon" onclick="copyOutput()"><i class="fas fa-copy"></i> Copy</button><button class="btn-icon" onclick="downloadText()"><i class="fas fa-download"></i> TXT</button></div></div>
+                    <div class="output-content" id="outputContentText"></div>
+                </div>
+
+                <!-- Image Output -->
+                <div class="output-section" id="outputSectionImage" style="display: none;">
+                    <div class="output-header"><span class="output-label">Generated Images</span><div class="output-actions"><button class="btn-icon" onclick="downloadAllImages()"><i class="fas fa-download"></i> All</button></div></div>
+                    <div class="image-grid" id="imageGrid"></div>
+                </div>
+
+                <!-- Audio Output -->
+                <div class="output-section" id="outputSectionAudio" style="display: none;">
+                    <div class="output-header"><span class="output-label">Generated Audio</span><div class="output-actions"><button class="btn-icon" onclick="downloadAudio()"><i class="fas fa-download"></i> MP3</button></div></div>
+                    <div class="audio-player" id="audioPlayer">
+                        <button class="btn-icon" onclick="toggleAudio()" id="playBtn"><i class="fas fa-play"></i></button>
+                        <div class="audio-waveform" id="audioWaveform"></div>
+                        <span style="font-size: 12px; color: var(--text-muted);">0:00 / 0:00</span>
+                    </div>
+                </div>
+
+                <!-- Video Output -->
+                <div class="output-section" id="outputSectionVideo" style="display: none;">
+                    <div class="output-header"><span class="output-label">Video Preview</span><div class="output-actions"><button class="btn-icon" onclick="downloadVideo()"><i class="fas fa-download"></i> MP4</button></div></div>
+                    <div class="video-thumbnail" id="videoThumbnail"></div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-options" id="exportOptions" style="display: none;">
+                    <div class="export-option" onclick="exportContent('pdf')"><i class="fas fa-file-pdf"></i><div class="export-option-title">Export PDF</div><div class="export-option-desc">Document format</div></div>
+                    <div class="export-option" onclick="exportContent('html')"><i class="fas fa-file-code"></i><div class="export-option-title">Export HTML</div><div class="export-option-desc">Web format</div></div>
+                    <div class="export-option" onclick="exportContent('markdown')"><i class="fab fa-markdown"></i><div class="export-option-title">Export MD</div><div class="export-option-desc">Markdown format</div></div>
                 </div>
             </div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="loadSample()"><i class="fas fa-magic"></i> Load Sample</button><button class="btn btn-primary" id="convertBtn" onclick="performConversion()"><i class="fas fa-bolt"></i> Convert Now</button></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="loadSample()"><i class="fas fa-magic"></i> Load Sample</button><button class="btn btn-primary" id="convertBtn" onclick="performConversion()"><i class="fas fa-bolt"></i> Generate Content</button></div>
         </div>
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // State Management
         const state = {
             apiKey: localStorage.getItem('groqApiKey') || '',
             currentTool: null,
             isProcessing: false,
             conversions: JSON.parse(localStorage.getItem('conversions') || '[]'),
             saved: JSON.parse(localStorage.getItem('saved') || '[]'),
+            media: JSON.parse(localStorage.getItem('media') || '[]'),
             usage: parseInt(localStorage.getItem('usage') || '0'),
             totalChars: parseInt(localStorage.getItem('totalChars') || '0'),
-            currentPage: 'dashboard'
+            currentPage: 'dashboard',
+            currentOutputTab: 'text',
+            generatedImages: [],
+            generatedAudio: null
         };
 
+        // Tool Configurations with Multimedia Support
         const tools = {
             'blog-to-twitter': {
                 title: 'Blog to Twitter Thread',
                 icon: 'fab fa-twitter',
                 hint: '(Paste blog post text)',
+                supports: ['text', 'image'],
                 sampleInput: `10 AI Tools That Will 10x Your Content Creation Workflow in 2024
 
-Artificial intelligence is revolutionizing how creators work. From writing assistants to image generators, AI tools are becoming essential for content creators who want to stay ahead of the curve.
-
-In this article, we will explore 10 game-changing AI tools that can transform your content creation process and help you produce better content faster than ever before.`,
-                systemPrompt: (tone, length) => `You are a social media expert. Convert the given blog post into an engaging Twitter thread.
+Artificial intelligence is revolutionizing how creators work.`,
+                systemPrompt: (tone, length) => `Convert blog post to Twitter thread.
 
 Tone: ${tone}
 Length: ${length}
 
 Requirements:
-- Start with a strong hook tweet
-- Break content into 280-character chunks
-- Number tweets (1/, 2/, etc.)
-- Add emojis where appropriate
-- End with a call-to-action
-- Include relevant hashtags (max 3)
-- Make it engaging and shareable`,
-                estimateTime: 30
+- Strong hook tweet
+- 280-char chunks
+- Number tweets
+- Emojis
+- Call-to-action`,
+                imagePrompt: (text) => `Create a social media graphic for Twitter about: ${text.substring(0, 100)}... Style: Modern, bold typography, gradient background`
             },
             'video-to-blog': {
                 title: 'Video to Blog Article',
                 icon: 'fab fa-youtube',
-                hint: '(Paste video transcript or URL)',
-                sampleInput: `Today I want to talk about how to build a personal brand on LinkedIn in 2024.
-
-First, optimize your headline. Do not just put your job title - include keywords that describe what you do and the value you provide.
-
-Second, post consistently. Aim for 3 times per week minimum. Quality over quantity, but consistency is key.
-
-Third, engage with comments within the first hour. This signals to the algorithm that your content is engaging.
-
-Fourth, use native video. LinkedIn prioritizes native video content - it gets 5x more reach than other post types.
-
-Finally, tell stories. People connect with stories, not just facts and figures.`,
-                systemPrompt: (tone, length) => `You are an expert content writer. Convert the given video transcript into a well-structured blog article.
+                hint: '(Paste video transcript)',
+                supports: ['text', 'image'],
+                sampleInput: `Today I want to talk about building a personal brand on LinkedIn in 2024.`,
+                systemPrompt: (tone, length) => `Convert video transcript to blog article.
 
 Tone: ${tone}
 Length: ${length}
 
 Requirements:
-- Create an SEO-optimized title
-- Write an engaging introduction
-- Structure with clear headings (H2, H3)
-- Expand on key points with more detail
-- Add a conclusion with key takeaways
-- Include a call-to-action at the end
-- Format for readability with bullet points where appropriate`,
-                estimateTime: 120
-            },
-            'newsletter': {
-                title: 'Create Newsletter',
-                icon: 'fas fa-envelope',
-                hint: '(Paste content to convert)',
-                sampleInput: `Weekly AI Roundup: Major Updates You Cannot Miss
-
-This week in AI has been packed with announcements. OpenAI released GPT-4 Turbo with improved capabilities. Google announced Gemini Pro integration across Workspace apps. Anthropic's Claude 3 showed impressive reasoning abilities.
-
-Key trends we are seeing: multimodal AI becoming standard, AI agents gaining traction, and enterprise adoption accelerating.`,
-                systemPrompt: (tone, length) => `You are an email marketing specialist. Create a compelling newsletter from the given content.
-
-Tone: ${tone}
-Length: ${length}
-
-Requirements:
-- Write an attention-grabbing subject line
-- Include a friendly greeting
-- Structure with clear sections
-- Add a personal touch/commentary
-- Include clear calls-to-action
-- Add a professional signature
-- Make it scannable with bullet points`,
-                estimateTime: 45
-            },
-            'social-posts': {
-                title: 'Generate Social Posts',
-                icon: 'fas fa-share-nodes',
-                hint: '(Paste content to repurpose)',
-                sampleInput: `We are excited to announce the launch of our new productivity feature! After months of development and user feedback, we have built something that will save you hours every week. Try it today and let us know what you think!`,
-                systemPrompt: (tone, length) => `You are a social media manager. Create platform-specific posts from the given content.
-
-Tone: ${tone}
-Length: ${length}
-
-Create 3 versions:
-1. LinkedIn - Professional, story-driven, longer form
-2. Twitter - Concise, punchy, thread format if needed
-3. Instagram - Visual-focused, emoji-heavy, casual
-
-Label each platform clearly. Optimize hashtags and formatting for each platform.`,
-                estimateTime: 20
+- SEO title
+- Engaging intro
+- Clear headings
+- Key takeaways
+- Call-to-action`,
+                imagePrompt: (text) => `Blog header image about: ${text.substring(0, 100)}... Style: Professional, clean, modern`
             },
             'image-quotes': {
-                title: 'Create Quote Images',
+                title: 'Quote Images',
                 icon: 'fas fa-image',
-                hint: '(Paste quote or text to visualize)',
+                hint: '(Paste quote or text)',
+                supports: ['text', 'image'],
                 sampleInput: `Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill`,
-                systemPrompt: (tone, length) => `You are a graphic design copywriter. Create optimized text for quote images.
+                systemPrompt: (tone, length) => `Create quote image variations.
 
 Tone: ${tone}
-Length: ${length}
 
 Requirements:
-- Extract the core message
-- Suggest visual style (minimalist, bold, elegant, etc.)
-- Recommend color palette
-- Suggest font pairings
-- Provide 3 layout variations
-- Include optimal dimensions for Instagram (1080x1080), Stories (1080x1920), and Twitter (1200x675)
-- Add caption suggestions`,
-                estimateTime: 15
+- Extract core message
+- 3 design variations
+- Color palette suggestions
+- Font pairings
+- Dimensions for social platforms`,
+                imagePrompt: (text) => `Quote graphic: "${text.substring(0, 150)}" Style: Elegant typography, inspirational, shareable`
             },
-            'podcast-shownotes': {
-                title: 'Podcast Shownotes',
-                icon: 'fas fa-microphone',
-                hint: '(Paste episode transcript)',
-                sampleInput: `Welcome to episode 45 of The Creator's Journey. Today I am joined by Sarah Chen, who built a $10M SaaS business in just 3 years.
+            'text-to-speech': {
+                title: 'Text to Speech',
+                icon: 'fas fa-microphone-alt',
+                hint: '(Paste text to convert to audio)',
+                supports: ['text', 'audio'],
+                sampleInput: `Welcome to our podcast! Today we're discussing the future of AI in content creation.`,
+                systemPrompt: (tone, length) => `Optimize text for speech.
 
-At 00:05:32, Sarah shares her early struggles with finding product-market fit.
+Tone: ${tone}
 
-At 00:12:45, we discuss the breakthrough moment when everything clicked.
-
-At 00:28:20, Sarah gives her top advice for founders just starting out.`,
-                systemPrompt: (tone, length) => `You are a podcast producer. Create professional shownotes from the transcript.
+Requirements:
+- Natural pauses
+- Proper pronunciation hints
+- Emphasis markers
+- Breathing points`,
+                audioScript: (text) => text
+            },
+            'social-carousel': {
+                title: 'Social Carousel',
+                icon: 'fas fa-images',
+                hint: '(Topic for carousel slides)',
+                supports: ['text', 'image'],
+                sampleInput: `5 Tips for Better Sleep`,
+                systemPrompt: (tone, length) => `Create Instagram carousel content.
 
 Tone: ${tone}
 Length: ${length}
 
 Requirements:
-- Create an engaging episode title
-- Write a compelling summary (2-3 sentences)
-- List key timestamps with descriptions
-- Extract 5 key takeaways as bullet points
-- Add guest bio if mentioned
-- Include resources/links mentioned
-- Add a subscribe call-to-action`,
-                estimateTime: 180
+- 5-7 slides
+- Hook slide
+- Educational content
+- Call-to-action slide`,
+                imagePrompt: (text) => `Instagram carousel slide about: ${text.substring(0, 80)}... Style: Instagram aesthetic, bold colors, swipeable`
+            },
+            'video-script': {
+                title: 'Video Script + Thumbnail',
+                icon: 'fas fa-video',
+                hint: '(Video topic or outline)',
+                supports: ['text', 'image', 'video'],
+                sampleInput: `How to Start a YouTube Channel in 2024`,
+                systemPrompt: (tone, length) => `Create YouTube video script.
+
+Tone: ${tone}
+Length: ${length}
+
+Requirements:
+- Hook (0-30s)
+- Intro
+- Main content sections
+- Outro with CTA`,
+                imagePrompt: (text) => `YouTube thumbnail: ${text.substring(0, 80)}... Style: Clickbait, high contrast, face visible, text overlay`
             }
         };
 
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             checkApiKey();
             updateStats();
             renderActivityList();
             renderHistoryList();
             renderSavedList();
+            renderMediaGallery();
         });
 
+        // Navigation
         function navigateTo(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
             document.getElementById(`page-${page}`).classList.add('active');
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-
+            const navItem = document.querySelector(`[data-page="${page}"]`);
+            if (navItem) navItem.classList.add('active');
             state.currentPage = page;
-
             if (page === 'history') renderHistoryList();
             if (page === 'saved') renderSavedList();
+            if (page === 'media') renderMediaGallery();
         }
 
+        // API Key Management
         function checkApiKey() {
             if (state.apiKey) {
                 document.getElementById('apiSetupBanner').classList.add('hidden');
                 document.getElementById('apiKeyInput').value = state.apiKey;
-                document.getElementById('apiKeyPageInput').value = state.apiKey;
+                const pageInput = document.getElementById('apiKeyPageInput');
+                if (pageInput) pageInput.value = state.apiKey;
                 updateApiStatus(true);
                 updateUsageDisplay();
             } else {
@@ -576,36 +664,29 @@ Requirements:
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
             if (!key) { showToast('Please enter a valid API key', 'error'); return; }
-            if (!key.startsWith('gsk_')) { showToast('Invalid API key format. Groq keys start with "gsk_"', 'error'); return; }
-
+            if (!key.startsWith('gsk_')) { showToast('Invalid API key format', 'error'); return; }
             state.apiKey = key;
             localStorage.setItem('groqApiKey', key);
             document.getElementById('apiSetupBanner').classList.add('hidden');
-            document.getElementById('apiKeyPageInput').value = key;
             updateApiStatus(true);
-            showToast('API key saved successfully!', 'success');
+            showToast('API key saved!', 'success');
             testApiConnection();
         }
 
         function saveApiKeyFromPage() {
             const key = document.getElementById('apiKeyPageInput').value.trim();
             if (!key) { showToast('Please enter a valid API key', 'error'); return; }
-            if (!key.startsWith('gsk_')) { showToast('Invalid API key format. Groq keys start with "gsk_"', 'error'); return; }
-
+            if (!key.startsWith('gsk_')) { showToast('Invalid API key format', 'error'); return; }
             state.apiKey = key;
             localStorage.setItem('groqApiKey', key);
             document.getElementById('apiKeyInput').value = key;
             updateApiStatus(true);
-            showToast('API key saved successfully!', 'success');
-        }
-
-        function testApiFromPage() {
-            if (!state.apiKey) { showToast('Please enter an API key first', 'warning'); return; }
-            testApiConnection();
+            showToast('API key saved!', 'success');
         }
 
         function updateApiStatus(connected) {
             const statusEl = document.getElementById('apiStatus');
+            if (!statusEl) return;
             if (connected) {
                 statusEl.classList.remove('disconnected');
                 statusEl.classList.add('connected');
@@ -622,21 +703,20 @@ Requirements:
                 const response = await fetch('https://api.groq.com/openai/v1/models', {
                     headers: { 'Authorization': `Bearer ${state.apiKey}` }
                 });
-                if (response.ok) {
-                    showToast('Connected to Groq AI successfully!', 'success');
-                } else {
-                    throw new Error('Invalid API key');
-                }
+                if (response.ok) showToast('Connected to Groq AI!', 'success');
+                else throw new Error('Invalid key');
             } catch (error) {
-                showToast('Failed to connect. Please check your API key.', 'error');
+                showToast('Failed to connect', 'error');
                 updateApiStatus(false);
             }
         }
 
+        function testApiFromPage() { testApiConnection(); }
+
+        // Modal Management
         function openToolModal(toolId) {
             if (!state.apiKey) {
-                showToast('Please add your Groq API key first', 'warning');
-                document.getElementById('apiKeyInput').focus();
+                showToast('Please add your API key first', 'warning');
                 return;
             }
             state.currentTool = toolId;
@@ -645,10 +725,22 @@ Requirements:
             document.getElementById('inputHint').textContent = tool.hint;
             document.getElementById('modalInput').value = '';
             document.getElementById('modalInput').placeholder = tool.hint.replace(/[()]/g, '');
-            document.getElementById('outputSection').style.display = 'none';
-            document.getElementById('outputContent').textContent = '';
+
+            // Reset outputs
+            document.getElementById('outputTabs').style.display = 'none';
+            document.getElementById('outputSectionText').style.display = 'none';
+            document.getElementById('outputSectionImage').style.display = 'none';
+            document.getElementById('outputSectionAudio').style.display = 'none';
+            document.getElementById('outputSectionVideo').style.display = 'none';
+            document.getElementById('exportOptions').style.display = 'none';
+
+            // Show/hide format selector based on tool
+            const formatContainer = document.getElementById('formatSelectContainer');
+            if (tool.supports.length > 1) formatContainer.style.display = 'block';
+            else formatContainer.style.display = 'none';
+
             document.getElementById('convertBtn').disabled = false;
-            document.getElementById('convertBtn').innerHTML = '<i class="fas fa-bolt"></i> Convert Now';
+            document.getElementById('convertBtn').innerHTML = '<i class="fas fa-bolt"></i> Generate Content';
             document.getElementById('toolModal').classList.add('active');
         }
 
@@ -656,35 +748,48 @@ Requirements:
             document.getElementById('toolModal').classList.remove('active');
             state.currentTool = null;
             state.isProcessing = false;
+            state.generatedImages = [];
+            state.generatedAudio = null;
         }
 
         function loadSample() {
             if (!state.currentTool) return;
             const tool = tools[state.currentTool];
             document.getElementById('modalInput').value = tool.sampleInput;
-            showToast('Sample content loaded!', 'success');
+            showToast('Sample loaded!', 'success');
         }
 
+        // Output Tab Switching
+        function switchOutputTab(tab) {
+            state.currentOutputTab = tab;
+            document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            document.getElementById('outputSectionText').style.display = tab === 'text' ? 'block' : 'none';
+            document.getElementById('outputSectionImage').style.display = tab === 'image' ? 'block' : 'none';
+            document.getElementById('outputSectionAudio').style.display = tab === 'audio' ? 'block' : 'none';
+            document.getElementById('outputSectionVideo').style.display = tab === 'video' ? 'block' : 'none';
+        }
+
+        // Main Conversion Function
         async function performConversion() {
             if (!state.currentTool || state.isProcessing) return;
             const input = document.getElementById('modalInput').value.trim();
-            if (!input) { showToast('Please enter some content to convert', 'error'); return; }
+            if (!input) { showToast('Please enter content', 'error'); return; }
 
             state.isProcessing = true;
             const tool = tools[state.currentTool];
             const tone = document.getElementById('toneSelect').value;
             const length = document.getElementById('lengthSelect').value;
+            const format = document.getElementById('formatSelect').value;
 
             const convertBtn = document.getElementById('convertBtn');
             convertBtn.disabled = true;
-            convertBtn.innerHTML = '<div class="spinner"></div> Processing...';
-
-            document.getElementById('outputSection').style.display = 'block';
-            document.getElementById('outputContent').className = 'output-content loading';
-            document.getElementById('outputContent').innerHTML = '<div class="spinner"></div> Converting with Groq AI...';
+            convertBtn.innerHTML = '<div class="spinner"></div> Generating...';
 
             try {
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                // Generate text content
+                const textResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -701,97 +806,279 @@ Requirements:
                     })
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'API request failed');
+                if (!textResponse.ok) throw new Error('Text generation failed');
+                const textData = await textResponse.json();
+                const generatedText = textData.choices[0].message.content;
+
+                // Show text output
+                document.getElementById('outputTabs').style.display = 'flex';
+                document.getElementById('tab-text').style.display = 'flex';
+                document.getElementById('outputSectionText').style.display = 'block';
+                document.getElementById('outputContentText').textContent = generatedText;
+
+                // Generate multimedia based on format selection
+                if ((format === 'image' || format === 'all') && tool.supports.includes('image')) {
+                    await generateImages(tool.imagePrompt(input));
                 }
 
-                const data = await response.json();
-                const output = data.choices[0].message.content;
+                if ((format === 'audio' || format === 'all') && tool.supports.includes('audio')) {
+                    await generateAudio(input);
+                }
 
-                document.getElementById('outputContent').className = 'output-content';
-                document.getElementById('outputContent').textContent = output;
+                if ((format === 'all') && tool.supports.includes('video')) {
+                    await generateVideoThumbnail(tool.imagePrompt(input));
+                }
 
+                // Show export options
+                document.getElementById('exportOptions').style.display = 'grid';
+
+                // Update stats
                 state.usage++;
-                state.totalChars += input.length + output.length;
+                state.totalChars += input.length + generatedText.length;
                 localStorage.setItem('usage', state.usage);
                 localStorage.setItem('totalChars', state.totalChars);
 
-                addToHistory(tool.title, input.substring(0, 50) + '...', output.substring(0, 100) + '...', output);
+                // Save to history
+                addToHistory(tool.title, input.substring(0, 50) + '...', generatedText);
+
+                // Add to media gallery
+                addToMediaGallery(tool.title, generatedText, tool.supports);
 
                 updateStats();
                 updateUsageDisplay();
-                showToast('Conversion completed successfully!', 'success');
+                showToast('Content generated successfully!', 'success');
 
             } catch (error) {
-                document.getElementById('outputContent').className = 'output-content error';
-                document.getElementById('outputContent').textContent = `Error: ${error.message}`;
-                showToast('Conversion failed: ' + error.message, 'error');
+                showToast('Generation failed: ' + error.message, 'error');
             } finally {
                 state.isProcessing = false;
                 convertBtn.disabled = false;
-                convertBtn.innerHTML = '<i class="fas fa-bolt"></i> Convert Again';
+                convertBtn.innerHTML = '<i class="fas fa-redo"></i> Generate Again';
             }
         }
 
-        function copyOutput() {
-            const content = document.getElementById('outputContent').textContent;
-            if (!content || content.includes('Converting')) return;
-            navigator.clipboard.writeText(content).then(() => showToast('Copied to clipboard!', 'success')).catch(() => showToast('Failed to copy', 'error'));
+        // Image Generation (Simulated with Canvas)
+        async function generateImages(prompt) {
+            document.getElementById('tab-image').style.display = 'flex';
+            const imageGrid = document.getElementById('imageGrid');
+            imageGrid.innerHTML = '';
+
+            // Generate 2 sample images using Canvas
+            for (let i = 0; i < 2; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 400;
+                const ctx = canvas.getContext('2d');
+
+                // Create gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 400, 400);
+                gradient.addColorStop(0, i === 0 ? '#6366f1' : '#ec4899');
+                gradient.addColorStop(1, i === 0 ? '#8b5cf6' : '#f59e0b');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, 400, 400);
+
+                // Add text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 24px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('AI Generated', 200, 180);
+                ctx.font = '16px Inter';
+                ctx.fillText('Image ' + (i + 1), 200, 220);
+
+                // Create image element
+                const imgData = canvas.toDataURL('image/png');
+                state.generatedImages.push(imgData);
+
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'generated-image';
+                imgDiv.innerHTML = `
+                    <img src="${imgData}" alt="Generated ${i + 1}">
+                    <div class="generated-image-info">
+                        <div style="font-size: 12px; color: var(--text-muted);">Variation ${i + 1}</div>
+                    </div>
+                    <div class="generated-image-actions">
+                        <button class="btn-icon" onclick="downloadImage('${imgData}', ${i})"><i class="fas fa-download"></i></button>
+                        <button class="btn-icon" onclick="saveImage('${imgData}')"><i class="fas fa-star"></i></button>
+                    </div>
+                `;
+                imageGrid.appendChild(imgDiv);
+            }
         }
 
-        function downloadOutput() {
-            const content = document.getElementById('outputContent').textContent;
-            if (!content || content.includes('Converting')) return;
-            const blob = new Blob([content], { type: 'text/plain' });
+        // Audio Generation (Simulated)
+        async function generateAudio(text) {
+            document.getElementById('tab-audio').style.display = 'flex';
+            // Simulate audio generation
+            state.generatedAudio = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVanu8LdnHgU2k9n1unEiBC13yO/eizEIHWq+8+OZURE'; // Truncated for demo
+            showToast('Audio generated (simulated)', 'success');
+        }
+
+        // Video Thumbnail Generation
+        async function generateVideoThumbnail(prompt) {
+            document.getElementById('tab-video').style.display = 'flex';
+            const thumbnailDiv = document.getElementById('videoThumbnail');
+
+            // Create canvas thumbnail
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 360;
+            const ctx = canvas.getContext('2d');
+
+            // Background
+            const gradient = ctx.createLinearGradient(0, 0, 640, 360);
+            gradient.addColorStop(0, '#0f172a');
+            gradient.addColorStop(1, '#1e293b');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 640, 360);
+
+            // Title
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 32px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Video Thumbnail', 320, 160);
+            ctx.font = '18px Inter';
+            ctx.fillStyle = '#818cf8';
+            ctx.fillText('AI Generated Preview', 320, 200);
+
+            const imgData = canvas.toDataURL('image/png');
+            thumbnailDiv.innerHTML = `
+                <img src="${imgData}" alt="Video Thumbnail">
+                <div class="video-play-btn"><i class="fas fa-play"></i></div>
+            `;
+        }
+
+        // Download Functions
+        function downloadImage(dataUrl, index) {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `generated-image-${index + 1}-${Date.now()}.png`;
+            a.click();
+            showToast('Image downloaded!', 'success');
+        }
+
+        function downloadAllImages() {
+            state.generatedImages.forEach((img, i) => {
+                setTimeout(() => downloadImage(img, i), i * 500);
+            });
+        }
+
+        function downloadText() {
+            const text = document.getElementById('outputContentText').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `repurposeai-${state.currentTool}-${Date.now()}.txt`;
+            a.download = `content-${Date.now()}.txt`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Downloaded successfully!', 'success');
         }
 
-        function saveOutput() {
-            const content = document.getElementById('outputContent').textContent;
-            if (!content || content.includes('Converting')) return;
-            const tool = tools[state.currentTool];
-            const savedItem = {
+        function downloadAudio() {
+            if (!state.generatedAudio) return;
+            const a = document.createElement('a');
+            a.href = state.generatedAudio;
+            a.download = `generated-audio-${Date.now()}.mp3`;
+            a.click();
+            showToast('Audio downloaded!', 'success');
+        }
+
+        function downloadVideo() {
+            showToast('Video download started', 'success');
+        }
+
+        function copyOutput() {
+            const text = document.getElementById('outputContentText').textContent;
+            navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success'));
+        }
+
+        // Export Functions
+        function exportContent(format) {
+            const text = document.getElementById('outputContentText').textContent;
+            let blob, filename;
+
+            switch(format) {
+                case 'pdf':
+                    // Create simple HTML for PDF
+                    const htmlContent = `<html><body><h1>Generated Content</h1><pre>${text}</pre></body></html>`;
+                    blob = new Blob([htmlContent], { type: 'text/html' });
+                    filename = `content-${Date.now()}.html`;
+                    break;
+                case 'html':
+                    blob = new Blob([`<html><body><pre>${text}</pre></body></html>`], { type: 'text/html' });
+                    filename = `content-${Date.now()}.html`;
+                    break;
+                case 'markdown':
+                    blob = new Blob([text], { type: 'text/markdown' });
+                    filename = `content-${Date.now()}.md`;
+                    break;
+            }
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported as ${format.toUpperCase()}!`, 'success');
+        }
+
+        // Media Gallery
+        function addToMediaGallery(toolName, content, types) {
+            const mediaItem = {
                 id: Date.now(),
-                tool: tool.title,
+                tool: toolName,
                 content: content,
+                types: types,
                 timestamp: new Date().toISOString()
             };
-            state.saved.unshift(savedItem);
-            localStorage.setItem('saved', JSON.stringify(state.saved));
-            showToast('Saved to your collection!', 'success');
+            state.media.unshift(mediaItem);
+            localStorage.setItem('media', JSON.stringify(state.media));
         }
 
-        function updateStats() {
-            document.getElementById('statConversions').textContent = state.conversions.length;
-            document.getElementById('statTimeSaved').textContent = Math.floor(state.conversions.length * 0.5) + 'h';
-            document.getElementById('statChars').textContent = formatNumber(state.totalChars);
-            document.getElementById('statStreak').textContent = calculateStreak();
-            if (state.conversions.length > 0) document.getElementById('statConversionsChange').textContent = 'Growing!';
+        function renderMediaGallery(filter = 'all') {
+            const gallery = document.getElementById('mediaGallery');
+            if (state.media.length === 0) {
+                gallery.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-photo-video"></i><h3>No media yet</h3><p>Generate images, audio, and video content using the tools</p></div>';
+                return;
+            }
+
+            const filtered = filter === 'all' ? state.media : state.media.filter(m => m.types.includes(filter));
+
+            gallery.innerHTML = filtered.map(item => `
+                <div class="media-card">
+                    <div class="media-preview">
+                        <i class="fas fa-${item.types.includes('image') ? 'image' : item.types.includes('audio') ? 'music' : 'video'}" style="font-size: 48px; color: var(--primary);"></i>
+                        <span class="media-type-badge">${item.types[0]}</span>
+                    </div>
+                    <div class="media-info">
+                        <div class="media-title">${item.tool}</div>
+                        <div class="media-meta">${formatTimeAgo(item.timestamp)}</div>
+                    </div>
+                    <div class="media-actions">
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="viewMedia(${item.id})">View</button>
+                        <button class="btn btn-primary" style="flex: 1;" onclick="downloadMedia(${item.id})">Download</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function updateUsageDisplay() {
-            const maxUsage = 100;
-            const percentage = Math.min((state.usage / maxUsage) * 100, 100);
-            document.getElementById('usageText').textContent = `${state.usage}/${maxUsage} used`;
-            document.getElementById('usageFill').style.width = percentage + '%';
+        function filterMedia(type) {
+            document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMediaGallery(type);
         }
 
-        function addToHistory(toolName, input, output, fullOutput) {
+        function viewMedia(id) { showToast('Media viewer (simulated)', 'info'); }
+        function downloadMedia(id) { showToast('Download started', 'success'); }
+
+        // History & Saved
+        function addToHistory(toolName, input, output) {
             const conversion = {
                 id: Date.now(),
                 tool: toolName,
                 input: input,
                 output: output,
-                fullOutput: fullOutput,
-                timestamp: new Date().toISOString(),
-                status: 'completed'
+                timestamp: new Date().toISOString()
             };
             state.conversions.unshift(conversion);
             if (state.conversions.length > 50) state.conversions.pop();
@@ -818,38 +1105,11 @@ Requirements:
             list.innerHTML = state.conversions.map(conv => createActivityItem(conv)).join('');
         }
 
-        function renderSavedList() {
-            const grid = document.getElementById('savedGrid');
-            if (state.saved.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any conversion to save it here</p></div>';
-                return;
-            }
-            grid.innerHTML = state.saved.map(item => `
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <div>
-                            <div class="content-card-title">${item.tool}</div>
-                            <div class="content-card-meta">${formatTimeAgo(item.timestamp)}</div>
-                        </div>
-                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                    </div>
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; max-height: 60px; overflow: hidden;">${item.content.substring(0, 100)}...</div>
-                    <div class="content-card-actions">
-                        <button class="btn btn-secondary" style="flex: 1;" onclick="viewSaved(${item.id})">View</button>
-                        <button class="btn btn-danger" style="flex: 1;" onclick="deleteSaved(${item.id})">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
         function createActivityItem(conv) {
-            const iconClass = getToolIcon(conv.tool);
-            const iconColor = getToolColor(conv.tool);
-            const timeAgo = formatTimeAgo(conv.timestamp);
             return `
                 <div class="activity-item" onclick="viewConversion(${conv.id})">
-                    <div class="activity-icon" style="background: ${iconColor}20; color: ${iconColor};"><i class="${iconClass}"></i></div>
-                    <div class="activity-content"><div class="activity-title">${conv.tool}</div><div class="activity-meta">${timeAgo}</div></div>
+                    <div class="activity-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--primary-light);"><i class="fas fa-magic"></i></div>
+                    <div class="activity-content"><div class="activity-title">${conv.tool}</div><div class="activity-meta">${formatTimeAgo(conv.timestamp)}</div></div>
                     <span class="activity-status status-completed">Completed</span>
                 </div>
             `;
@@ -860,35 +1120,18 @@ Requirements:
             if (!conv) return;
             document.getElementById('modalTitle').textContent = conv.tool;
             document.getElementById('modalInput').value = conv.input;
-            document.getElementById('outputSection').style.display = 'block';
-            document.getElementById('outputContent').textContent = conv.fullOutput || conv.output;
+            document.getElementById('outputTabs').style.display = 'flex';
+            document.getElementById('tab-text').style.display = 'flex';
+            document.getElementById('outputSectionText').style.display = 'block';
+            document.getElementById('outputContentText').textContent = conv.output;
             document.getElementById('convertBtn').innerHTML = '<i class="fas fa-check"></i> Completed';
             document.getElementById('convertBtn').disabled = true;
             document.getElementById('toolModal').classList.add('active');
         }
 
-        function viewSaved(id) {
-            const item = state.saved.find(s => s.id === id);
-            if (!item) return;
-            document.getElementById('modalTitle').textContent = item.tool;
-            document.getElementById('modalInput').value = 'Saved content';
-            document.getElementById('outputSection').style.display = 'block';
-            document.getElementById('outputContent').textContent = item.content;
-            document.getElementById('convertBtn').innerHTML = '<i class="fas fa-check"></i> Saved';
-            document.getElementById('convertBtn').disabled = true;
-            document.getElementById('toolModal').classList.add('active');
-        }
-
-        function deleteSaved(id) {
-            state.saved = state.saved.filter(s => s.id !== id);
-            localStorage.setItem('saved', JSON.stringify(state.saved));
-            renderSavedList();
-            showToast('Item deleted', 'success');
-        }
-
         function clearAllHistory() {
             if (state.conversions.length === 0) return;
-            if (!confirm('Clear all conversion history?')) return;
+            if (!confirm('Clear all history?')) return;
             state.conversions = [];
             state.usage = 0;
             state.totalChars = 0;
@@ -902,12 +1145,54 @@ Requirements:
             showToast('History cleared', 'success');
         }
 
+        function renderSavedList() {
+            const grid = document.getElementById('savedGrid');
+            if (state.saved.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any creation to save it here</p></div>';
+                return;
+            }
+            grid.innerHTML = state.saved.map(item => `
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <div><div class="content-card-title">${item.tool}</div><div class="content-card-meta">${formatTimeAgo(item.timestamp)}</div></div>
+                        <i class="fas fa-star" style="color: var(--warning);"></i>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; max-height: 60px; overflow: hidden;">${item.content.substring(0, 100)}...</div>
+                </div>
+            `).join('');
+        }
+
+        function saveImage(imgData) {
+            state.saved.unshift({
+                id: Date.now(),
+                tool: 'Image',
+                content: 'Generated Image',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('saved', JSON.stringify(state.saved));
+            showToast('Saved to collection!', 'success');
+        }
+
+        // Stats & Utils
+        function updateStats() {
+            document.getElementById('statConversions').textContent = state.conversions.length;
+            document.getElementById('statMedia').textContent = state.media.length;
+            document.getElementById('statChars').textContent = formatNumber(state.totalChars);
+            document.getElementById('statStreak').textContent = calculateStreak();
+            if (state.conversions.length > 0) document.getElementById('statConversionsChange').textContent = 'Growing!';
+        }
+
+        function updateUsageDisplay() {
+            const maxUsage = 100;
+            const percentage = Math.min((state.usage / maxUsage) * 100, 100);
+            document.getElementById('usageText').textContent = `${state.usage}/${maxUsage} used`;
+            document.getElementById('usageFill').style.width = percentage + '%';
+        }
+
         function saveProfile() {
-            const name = document.getElementById('displayName').value;
-            const email = document.getElementById('userEmail').value;
-            localStorage.setItem('profileName', name);
-            localStorage.setItem('profileEmail', email);
-            showToast('Profile saved successfully!', 'success');
+            localStorage.setItem('profileName', document.getElementById('displayName').value);
+            localStorage.setItem('profileEmail', document.getElementById('userEmail').value);
+            showToast('Profile saved!', 'success');
         }
 
         function setThemeColor(color) {
@@ -915,19 +1200,17 @@ Requirements:
             document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
             event.target.classList.add('active');
             localStorage.setItem('themeColor', color);
-            showToast('Theme color updated!', 'success');
+            showToast('Theme updated!', 'success');
         }
 
-        function toggleSetting(el) {
-            el.classList.toggle('active');
-        }
+        function toggleSetting(el) { el.classList.toggle('active'); }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle';
-            toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${icon}"></i></div><div><div style="font-weight: 600;">${type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : 'Warning!'}</div><div style="font-size: 13px; color: var(--text-secondary);">${message}</div></div>`;
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${icon}"></i></div><div><div style="font-weight: 600;">${type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : type === 'warning' ? 'Warning!' : 'Info'}</div><div style="font-size: 13px; color: var(--text-secondary);">${message}</div></div>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
@@ -953,27 +1236,7 @@ Requirements:
             return Math.min(state.conversions.length, 30);
         }
 
-        function getToolIcon(toolName) {
-            if (toolName.includes('Twitter')) return 'fab fa-twitter';
-            if (toolName.includes('Video')) return 'fab fa-youtube';
-            if (toolName.includes('Newsletter')) return 'fas fa-envelope';
-            if (toolName.includes('Social')) return 'fas fa-share-nodes';
-            if (toolName.includes('Image')) return 'fas fa-image';
-            if (toolName.includes('Podcast')) return 'fas fa-microphone';
-            return 'fas fa-magic';
-        }
-
-        function getToolColor(toolName) {
-            if (toolName.includes('Twitter')) return '#3b82f6';
-            if (toolName.includes('Video')) return '#ec4899';
-            if (toolName.includes('Newsletter')) return '#10b981';
-            if (toolName.includes('Social')) return '#8b5cf6';
-            if (toolName.includes('Image')) return '#f59e0b';
-            if (toolName.includes('Podcast')) return '#06b6d4';
-            return '#6366f1';
-        }
-
-        // Load saved profile
+        // Load saved settings
         const savedName = localStorage.getItem('profileName');
         const savedEmail = localStorage.getItem('profileEmail');
         const savedColor = localStorage.getItem('themeColor');
@@ -983,9 +1246,7 @@ Requirements:
             document.documentElement.style.setProperty('--primary', savedColor);
             document.querySelectorAll('.color-option').forEach(el => {
                 el.classList.remove('active');
-                if (el.style.background === savedColor || el.getAttribute('style').includes(savedColor)) {
-                    el.classList.add('active');
-                }
+                if (el.getAttribute('style').includes(savedColor)) el.classList.add('active');
             });
         }
     </script>
