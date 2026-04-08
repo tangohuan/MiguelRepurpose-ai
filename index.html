@@ -484,19 +484,45 @@ Join us next week as we interview a creator who grew to 100k followers using onl
             const imageElement = document.getElementById('generated-image');
             const downloadLink = document.getElementById('download-image');
 
-            if (!imageContainer || !imageElement) return;
+            if (!imageContainer || !imageElement) {
+                console.error('Image elements not found');
+                return;
+            }
+
+            // Show loading state
+            imageContainer.style.display = 'block';
+            imageElement.style.display = 'none';
+            imageContainer.innerHTML = '<p style="color: var(--primary-color); margin-bottom: 0.5rem;">🎨 Generating image...</p><div class="loading-spinner" style="width: 40px; height: 40px; margin: 1rem auto;"></div>';
 
             // Create image prompt from text
-            const imagePrompt = isDemo ? 
-                'Abstract digital art, colorful, creative, modern design, high quality' :
-                encodeURIComponent(promptText.substring(0, 200));
+            let imagePrompt;
+            if (isDemo) {
+                imagePrompt = 'professional business productivity software interface, modern minimalist design, people working remotely on laptops, clean office space, bright natural lighting, high quality digital art, 4k, detailed';
+            } else {
+                // Extract key concepts from the input text
+                const keyWords = promptText.split(' ').slice(0, 15).join(' ');
+                imagePrompt = `${keyWords}, professional marketing visual, social media post image, high quality, 4k, detailed, modern style`;
+            }
+
+            // Encode the prompt
+            const encodedPrompt = encodeURIComponent(imagePrompt.substring(0, 300));
 
             // Use Pollinations.ai (completely free, no API key)
-            const imageUrl = `https://image.pollinations.ai/prompt/${imagePrompt}?width=1024&height=1024&nologo=true`;
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
 
-            imageElement.src = imageUrl;
-            downloadLink.href = imageUrl;
-            imageContainer.style.display = 'block';
+            // Create new image element to handle loading
+            const newImg = new Image();
+            newImg.onload = function() {
+                imageContainer.innerHTML = `
+                    <p style="font-weight: 500; color: var(--primary-color); margin-bottom: 0.5rem;">🎨 Generated Image:</p>
+                    <img id="generated-image" src="${imageUrl}" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block;" />
+                    <br><a href="${imageUrl}" download="generated-image.png" target="_blank" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem; display: inline-block;">⬇️ Download Image</a>
+                `;
+            };
+            newImg.onerror = function() {
+                imageContainer.innerHTML = '<p style="color: #e74c3c;">❌ Failed to load image. Please try again.</p>';
+            };
+            newImg.src = imageUrl;
         }
 
         async function generate(name) {
