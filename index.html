@@ -4,1250 +4,1749 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RepurposeAI - Multimedia Content Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* ========================================
+           YOUR EXISTING STRUCTURE + NEW FEATURES
+           ======================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
             --secondary: #ec4899;
-            --accent: #10b981;
+            --accent: #8b5cf6;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --info: #06b6d4;
-            --bg: #0f172a;
-            --bg-elevated: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: #475569;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            --glow: 0 0 40px rgba(99, 102, 241, 0.3);
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .bg-animation::before { content: ''; position: absolute; width: 150%; height: 150%; background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 40%); animation: float 20s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
-        .app-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 280px; background: var(--bg-elevated); border-right: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
-        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; cursor: pointer; transition: transform 0.3s ease; }
-        .logo:hover { transform: scale(1.02); }
-        .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3); }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .nav-section { margin-bottom: 32px; }
-        .nav-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 12px; padding-left: 12px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; margin-bottom: 4px; color: var(--text-secondary); }
-        .nav-item:hover, .nav-item.active { background: rgba(99, 102, 241, 0.1); color: var(--text-primary); }
-        .nav-item.active { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); }
-        .nav-item i { width: 20px; text-align: center; }
-        .upgrade-card { margin-top: auto; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.15) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 16px; padding: 20px; text-align: center; }
-        .upgrade-card h4 { font-size: 14px; margin-bottom: 8px; }
-        .upgrade-card p { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
-        .btn-upgrade { width: 100%; padding: 10px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4); }
-        .main-content { flex: 1; margin-left: 280px; padding: 32px 40px; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
-        .page-header p { color: var(--text-secondary); font-size: 14px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 20px; }
-        .api-status { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--bg-elevated); border-radius: 20px; border: 1px solid var(--border); font-size: 13px; }
-        .api-status.connected { border-color: var(--accent); color: var(--accent); }
-        .api-status.disconnected { border-color: var(--error); color: var(--error); }
-        .usage-widget { display: flex; align-items: center; gap: 12px; background: var(--bg-elevated); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .usage-bar { width: 100px; height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; }
-        .usage-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; transition: width 0.5s ease; }
-        .usage-text { font-size: 12px; color: var(--text-secondary); }
-        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.3s ease; }
-        .user-avatar:hover { transform: scale(1.1); }
-        .api-setup { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%); border: 1px solid var(--warning); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-        .api-setup.hidden { display: none; }
-        .api-setup-text { display: flex; align-items: center; gap: 12px; }
-        .api-setup-text i { font-size: 24px; color: var(--warning); }
-        .api-setup-input { display: flex; gap: 12px; align-items: center; }
-        .api-input { padding: 10px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); width: 300px; font-size: 13px; }
-        .api-input:focus { outline: none; border-color: var(--primary); }
-        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
-        .stat-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s ease; }
-        .stat-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--glow); }
-        .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-        .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
-        .stat-change { font-size: 12px; color: var(--accent); }
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
-        .tool-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px; padding: 24px; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-        .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 50%); opacity: 0; transition: opacity 0.3s ease; }
-        .tool-card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--primary); box-shadow: var(--shadow), var(--glow); }
-        .tool-card:hover::before { opacity: 1; }
-        .tool-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; transition: transform 0.3s ease; }
-        .tool-card:hover .tool-icon { transform: scale(1.1) rotate(5deg); }
-        .tool-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-        .tool-icon.pink { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); }
-        .tool-icon.green { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
-        .tool-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
-        .tool-icon.orange { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); }
-        .tool-icon.cyan { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
-        .tool-icon.red { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
-        .tool-icon.yellow { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); }
-        .tool-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-        .tool-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; }
-        .tool-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted); }
-        .tool-meta span { display: flex; align-items: center; gap: 4px; }
-        .activity-section { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
-        .activity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .view-all { font-size: 13px; color: var(--primary); cursor: pointer; transition: color 0.3s ease; }
-        .view-all:hover { color: var(--primary-light); }
-        .activity-list { display: flex; flex-direction: column; gap: 12px; }
-        .activity-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-card); border-radius: 12px; transition: all 0.3s ease; cursor: pointer; }
-        .activity-item:hover { transform: translateX(8px); border-left: 3px solid var(--primary); }
-        .activity-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .activity-content { flex: 1; }
-        .activity-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-        .activity-meta { font-size: 12px; color: var(--text-muted); }
-        .activity-status { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-        .status-completed { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
-        .status-processing { background: rgba(99, 102, 241, 0.2); color: var(--primary-light); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 900px; max-height: 90vh; overflow: hidden; transform: scale(0.9) translateY(20px); transition: transform 0.3s ease; display: flex; flex-direction: column; }
-        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
-        .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-size: 20px; font-weight: 600; }
-        .modal-close { width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: none; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; }
-        .modal-close:hover { background: var(--primary); color: white; }
-        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
-        .input-group { margin-bottom: 20px; }
-        .input-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; color: var(--text-secondary); }
-        .input-field { width: 100%; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-size: 14px; transition: all 0.3s ease; font-family: inherit; }
-        .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        .input-field::placeholder { color: var(--text-muted); }
-        textarea.input-field { min-height: 120px; resize: vertical; }
-        .settings-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-        .select-field { width: 100%; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--text-primary); font-size: 13px; cursor: pointer; transition: all 0.3s ease; }
-        .select-field:focus { outline: none; border-color: var(--primary); }
+        /* ========================================
+           AUTH MODAL (New - overlays everything)
+           ======================================== */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
 
-        /* Multimedia Output Styles */
-        .output-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        .output-tab { padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .output-tab:hover { background: var(--bg-card); color: var(--text-primary); }
-        .output-tab.active { background: var(--primary); border-color: var(--primary); color: white; }
-        .output-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .output-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-icon { padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .btn-icon:hover { background: var(--primary); border-color: var(--primary); color: white; }
-        .output-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 150px; max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
-        .output-content.loading { display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-        .output-content.error { border-color: var(--error); color: var(--error); }
+        .auth-overlay.hidden {
+            display: none;
+        }
 
-        /* Image Generation Styles */
-        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
-        .generated-image { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        .generated-image img { width: 100%; height: 200px; object-fit: cover; }
-        .generated-image-info { padding: 12px; }
-        .generated-image-actions { display: flex; gap: 8px; padding: 0 12px 12px; }
+        .auth-box {
+            background: var(--surface);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--surface-light);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
 
-        /* Audio Player Styles */
-        .audio-player { background: var(--bg-card); border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; }
-        .audio-waveform { flex: 1; height: 40px; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 4px; opacity: 0.6; position: relative; overflow: hidden; }
-        .audio-waveform::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(90deg, transparent, transparent 2px, var(--bg-card) 2px, var(--bg-card) 4px); }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
 
-        /* Video Thumbnail */
-        .video-thumbnail { position: relative; border-radius: 12px; overflow: hidden; background: var(--bg-card); }
-        .video-thumbnail img { width: 100%; height: 220px; object-fit: cover; }
-        .video-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(99, 102, 241, 0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
-        .video-play-btn:hover { transform: translate(-50%, -50%) scale(1.1); background: var(--primary); }
-        .video-play-btn i { color: white; font-size: 24px; margin-left: 4px; }
+        .auth-logo h1 {
+            font-size: 1.75rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
 
-        /* Canvas for Quote Images */
-        #quoteCanvas { max-width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg);
+            padding: 0.25rem;
+            border-radius: 0.75rem;
+        }
 
-        /* Export Options */
-        .export-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
-        .export-option { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
-        .export-option:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .export-option i { font-size: 24px; margin-bottom: 8px; color: var(--primary); }
-        .export-option-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .export-option-desc { font-size: 11px; color: var(--text-muted); }
+        .auth-tab {
+            flex: 1;
+            padding: 0.625rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
 
-        .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn { padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border: none; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .btn-secondary { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
-        .btn-secondary:hover { background: var(--border); color: var(--text-primary); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
-        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--error); border: 1px solid var(--error); }
-        .btn-danger:hover { background: var(--error); color: white; }
-        .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 12px; z-index: 2000; }
-        .toast { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); transform: translateX(400px); opacity: 0; transition: all 0.4s ease; min-width: 300px; }
-        .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-        .toast-success .toast-icon { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
-        .toast-error .toast-icon { background: rgba(239, 68, 68, 0.2); color: var(--error); }
-        .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .empty-state { text-align: center; padding: 60px 40px; color: var(--text-muted); }
-        .empty-state i { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
-        .empty-state h3 { font-size: 20px; margin-bottom: 8px; color: var(--text-secondary); }
-        .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .content-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 20px; transition: all 0.3s ease; }
-        .content-card:hover { transform: translateY(-4px); border-color: var(--primary); }
-        .content-card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
-        .content-card-title { font-weight: 600; margin-bottom: 4px; }
-        .content-card-meta { font-size: 12px; color: var(--text-muted); }
-        .content-card-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .settings-section { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 24px; }
-        .settings-section h3 { margin-bottom: 20px; font-size: 16px; }
-        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
-        .setting-item:last-child { border-bottom: none; }
-        .setting-info h4 { font-size: 14px; margin-bottom: 4px; }
-        .setting-info p { font-size: 13px; color: var(--text-muted); }
-        .toggle { width: 50px; height: 26px; background: var(--bg-card); border-radius: 13px; position: relative; cursor: pointer; transition: all 0.3s ease; }
-        .toggle.active { background: var(--primary); }
-        .toggle::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: all 0.3s ease; }
-        .toggle.active::after { left: 26px; }
-        .color-picker { display: flex; gap: 12px; }
-        .color-option { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.3s ease; }
-        .color-option:hover, .color-option.active { border-color: white; transform: scale(1.1); }
-        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
-        .analytics-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-        .analytics-card h4 { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
-        .chart-placeholder { height: 200px; background: var(--bg-card); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-        .schedule-calendar { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .calendar-day { aspect-ratio: 1; background: var(--bg-card); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: all 0.3s ease; }
-        .calendar-day:hover { background: var(--primary); }
-        .calendar-day.has-event { border: 2px solid var(--primary); }
+        .auth-tab.active {
+            background: var(--surface-light);
+            color: var(--text);
+        }
 
-        /* Media Gallery */
-        .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .media-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
-        .media-card:hover { transform: translateY(-4px); border-color: var(--primary); }
-        .media-preview { height: 160px; background: var(--bg-card); display: flex; align-items: center; justify-content: center; position: relative; }
-        .media-preview img, .media-preview video { width: 100%; height: 100%; object-fit: cover; }
-        .media-type-badge { position: absolute; top: 12px; left: 12px; padding: 4px 12px; background: rgba(0,0,0,0.7); border-radius: 20px; font-size: 11px; text-transform: uppercase; }
-        .media-info { padding: 16px; }
-        .media-title { font-weight: 600; margin-bottom: 4px; }
-        .media-meta { font-size: 12px; color: var(--text-muted); }
-        .media-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+        .auth-form {
+            display: none;
+        }
 
-        @media (max-width: 1200px) { .tools-grid { grid-template-columns: repeat(2, 1fr); } .analytics-grid { grid-template-columns: 1fr; } .settings-row { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; padding: 20px; } .tools-grid { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2, 1fr); } .api-input { width: 200px; } .image-grid { grid-template-columns: 1fr; } .export-options { grid-template-columns: 1fr; } }
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--surface-light);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 0.9375rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--gradient);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .btn-auth:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.25rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--surface-light);
+        }
+
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn-social {
+            padding: 0.625rem;
+            background: var(--bg);
+            border: 1px solid var(--surface-light);
+            border-radius: 0.5rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-social:hover {
+            border-color: var(--primary);
+        }
+
+        .auth-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .auth-error.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========================================
+           MAIN LAYOUT (Your Existing Structure)
+           ======================================== */
+
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .top-header {
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-bottom: 1px solid var(--surface-light);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-widget {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .user-widget:hover {
+            background: var(--surface-light);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.625rem 0.875rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .dropdown-item:hover {
+            background: var(--surface-light);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--surface-light);
+            margin: 0.5rem 0;
+        }
+
+        /* Left Sidebar */
+        .sidebar-left {
+            background: var(--surface);
+            border-right: 1px solid var(--surface-light);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .stat-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label-small {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--bg);
+            border: 1px solid var(--surface-light);
+            border-radius: 0.75rem;
+            color: var(--text);
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            font-size: 0.9375rem;
+        }
+
+        .action-btn:hover {
+            background: var(--surface-light);
+            border-color: var(--primary);
+        }
+
+        .action-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .content-header h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .content-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* DRAG & DROP UPLOAD (New Feature) */
+        .upload-zone {
+            background: var(--surface);
+            border: 2px dashed var(--surface-light);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone.has-file {
+            border-style: solid;
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-icon-large {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-display {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .file-display.show {
+            display: flex;
+        }
+
+        .file-thumb {
+            width: 60px;
+            height: 60px;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .file-info-text {
+            text-align: left;
+        }
+
+        .file-info-text .name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-info-text .meta {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .remove-btn {
+            color: var(--error);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Tools Grid */
+        .tools-section {
+            display: none;
+        }
+
+        .tools-section.active {
+            display: block;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+
+        .tool-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--bg);
+        }
+
+        .tool-title h4 {
+            font-size: 1rem;
+            margin-bottom: 0.125rem;
+        }
+
+        .tool-title span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .tool-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-tool {
+            flex: 1;
+            padding: 0.625rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary-tool {
+            background: var(--gradient);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary-tool:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary-tool {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--surface-light);
+        }
+
+        .btn-secondary-tool:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .time-badge {
+            display: inline-block;
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Right Sidebar */
+        .sidebar-right {
+            background: var(--surface);
+            border-left: 1px solid var(--surface-light);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .settings-group {
+            margin-bottom: 2rem;
+        }
+
+        .settings-group h4 {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 0.875rem;
+        }
+
+        .setting-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle.active {
+            background: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        /* Subscription Box */
+        .subscription-box {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .subscription-box h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-badge {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-bar {
+            height: 6px;
+            background: var(--surface-light);
+            border-radius: 3px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: var(--gradient);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 9998;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container.active {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-left,
+            .sidebar-right {
+                display: none;
+            }
+        }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <div class="bg-animation"></div>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo" onclick="navigateTo('dashboard')">
-                <div class="logo-icon"><i class="fas fa-sync-alt"></i></div>
-                <div class="logo-text">RepurposeAI</div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-label">Dashboard</div>
-                <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')"><i class="fas fa-home"></i><span>Overview</span></div>
-                <div class="nav-item" data-page="media" onclick="navigateTo('media')"><i class="fas fa-photo-video"></i><span>Media Studio</span></div>
-                <div class="nav-item" data-page="history" onclick="navigateTo('history')"><i class="fas fa-history"></i><span>History</span></div>
-                <div class="nav-item" data-page="saved" onclick="navigateTo('saved')"><i class="fas fa-star"></i><span>Saved</span></div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-label">Tools</div>
-                <div class="nav-item" data-page="content" onclick="navigateTo('content')"><i class="fas fa-blog"></i><span>My Content</span></div>
-                <div class="nav-item" data-page="schedule" onclick="navigateTo('schedule')"><i class="fas fa-calendar"></i><span>Schedule</span></div>
-                <div class="nav-item" data-page="analytics" onclick="navigateTo('analytics')"><i class="fas fa-chart-line"></i><span>Analytics</span></div>
-            </div>
-            <div class="nav-section">
-                <div class="nav-label">Settings</div>
-                <div class="nav-item" data-page="appearance" onclick="navigateTo('appearance')"><i class="fas fa-palette"></i><span>Appearance</span></div>
-                <div class="nav-item" data-page="account" onclick="navigateTo('account')"><i class="fas fa-user"></i><span>Account</span></div>
-                <div class="nav-item" data-page="api" onclick="navigateTo('api')"><i class="fas fa-key"></i><span>API Keys</span></div>
-            </div>
-            <div class="upgrade-card">
-                <h4>Upgrade to Pro</h4>
-                <p>Multimedia generation & more</p>
-                <button class="btn-upgrade" onclick="showToast('Coming soon!', 'warning')">Upgrade $9/mo</button>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <!-- DASHBOARD PAGE -->
-            <div class="page active" id="page-dashboard">
-                <div class="api-setup" id="apiSetupBanner">
-                    <div class="api-setup-text">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div>
-                            <div style="font-weight: 600; margin-bottom: 4px;">Groq API Key Required</div>
-                            <div style="font-size: 13px; color: var(--text-secondary);">Get your free key at console.groq.com</div>
-                        </div>
-                    </div>
-                    <div class="api-setup-input">
-                        <input type="password" class="api-input" id="apiKeyInput" placeholder="Enter your Groq API key...">
-                        <button class="btn btn-primary" onclick="saveApiKey()" style="padding: 10px 20px;"><i class="fas fa-save"></i> Save</button>
-                    </div>
-                </div>
-                <header class="header">
-                    <div class="header-left"><h1>Transform your content in seconds</h1><p>Generate text, images, audio & video with AI</p></div>
-                    <div class="header-right">
-                        <div class="api-status disconnected" id="apiStatus"><i class="fas fa-circle" style="font-size: 8px;"></i><span>Disconnected</span></div>
-                        <div class="usage-widget"><span class="usage-text" id="usageText">0/100 used</span><div class="usage-bar"><div class="usage-fill" id="usageFill"></div></div></div>
-                        <div class="user-avatar" onclick="navigateTo('account')"><i class="fas fa-user"></i></div>
-                    </div>
-                </header>
-                <div class="stats-bar">
-                    <div class="stat-card"><div class="stat-label">Conversions</div><div class="stat-value" id="statConversions">0</div><div class="stat-change" id="statConversionsChange">Start creating!</div></div>
-                    <div class="stat-card"><div class="stat-label">Media Generated</div><div class="stat-value" id="statMedia">0</div><div class="stat-change">Images, audio & more</div></div>
-                    <div class="stat-card"><div class="stat-label">Characters</div><div class="stat-value" id="statChars">0</div><div class="stat-change">Processed</div></div>
-                    <div class="stat-card"><div class="stat-label">Streak</div><div class="stat-value" id="statStreak">0</div><div class="stat-change">Keep it up!</div></div>
-                </div>
-                <h2 class="section-title"><i class="fas fa-bolt" style="color: var(--primary);"></i>Quick Actions</h2>
-                <div class="tools-grid">
-                    <div class="tool-card" data-tool="blog-to-twitter" onclick="openToolModal('blog-to-twitter')"><div class="tool-icon blue"><i class="fab fa-twitter"></i></div><div class="tool-title">Blog to Twitter</div><div class="tool-desc">Transform blog posts into engaging Twitter threads</div><div class="tool-meta"><span><i class="fas fa-font"></i> Text</span><span><i class="fas fa-fire"></i> Popular</span></div></div>
-                    <div class="tool-card" data-tool="video-to-blog" onclick="openToolModal('video-to-blog')"><div class="tool-icon pink"><i class="fab fa-youtube"></i></div><div class="tool-title">Video to Blog</div><div class="tool-desc">Convert videos into SEO-optimized articles</div><div class="tool-meta"><span><i class="fas fa-font"></i> Text</span><span><i class="fas fa-star"></i> 4.9</span></div></div>
-                    <div class="tool-card" data-tool="image-quotes" onclick="openToolModal('image-quotes')"><div class="tool-icon orange"><i class="fas fa-image"></i></div><div class="tool-title">Quote Images</div><div class="tool-desc">Create shareable quote graphics with AI</div><div class="tool-meta"><span><i class="fas fa-image"></i> Image</span><span><i class="fas fa-wand-magic-sparkles"></i> AI</span></div></div>
-                    <div class="tool-card" data-tool="text-to-speech" onclick="openToolModal('text-to-speech')"><div class="tool-icon green"><i class="fas fa-microphone-alt"></i></div><div class="tool-title">Text to Speech</div><div class="tool-desc">Convert text to natural AI voice audio</div><div class="tool-meta"><span><i class="fas fa-music"></i> Audio</span><span><i class="fas fa-volume-up"></i> Voice</span></div></div>
-                    <div class="tool-card" data-tool="social-carousel" onclick="openToolModal('social-carousel')"><div class="tool-icon purple"><i class="fas fa-images"></i></div><div class="tool-title">Social Carousel</div><div class="tool-desc">Generate multi-slide Instagram carousels</div><div class="tool-meta"><span><i class="fas fa-image"></i> Images</span><span><i class="fas fa-layer-group"></i> Multi</span></div></div>
-                    <div class="tool-card" data-tool="video-script" onclick="openToolModal('video-script')"><div class="tool-icon red"><i class="fas fa-video"></i></div><div class="tool-title">Video Script + Thumbnail</div><div class="tool-desc">Create scripts with AI-generated thumbnails</div><div class="tool-meta"><span><i class="fas fa-photo-video"></i> Mixed</span><span><i class="fas fa-fire"></i> Hot</span></div></div>
-                </div>
-                <div class="activity-section">
-                    <div class="activity-header"><h3 class="section-title" style="margin: 0;"><i class="fas fa-clock-rotate-left" style="color: var(--secondary);"></i>Recent Activity</h3><span class="view-all" onclick="navigateTo('history')">View All</span></div>
-                    <div class="activity-list" id="activityList"><div class="empty-state"><i class="fas fa-inbox"></i><p>No conversions yet. Start by selecting a tool above!</p></div></div>
-                </div>
+    <!-- ========================================
+         AUTHENTICATION OVERLAY
+         ======================================== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-box">
+            <div class="auth-logo">
+                <h1>⚡ RepurposeAI</h1>
+                <p>Smart content repurposing tools</p>
             </div>
 
-            <!-- MEDIA STUDIO PAGE -->
-            <div class="page" id="page-media">
-                <div class="page-header"><h1>Media Studio</h1><p>Your generated multimedia content library</p></div>
-                <div class="output-tabs" style="margin-bottom: 24px;">
-                    <button class="output-tab active" onclick="filterMedia('all')"><i class="fas fa-th"></i> All</button>
-                    <button class="output-tab" onclick="filterMedia('image')"><i class="fas fa-image"></i> Images</button>
-                    <button class="output-tab" onclick="filterMedia('audio')"><i class="fas fa-music"></i> Audio</button>
-                    <button class="output-tab" onclick="filterMedia('video')"><i class="fas fa-video"></i> Video</button>
-                </div>
-                <div class="media-gallery" id="mediaGallery">
-                    <div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-photo-video"></i><h3>No media yet</h3><p>Generate images, audio, and video content using the tools</p></div>
-                </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+                <button class="auth-tab" onclick="switchTab('register')">Create Account</button>
             </div>
 
-            <!-- HISTORY PAGE -->
-            <div class="page" id="page-history">
-                <div class="page-header"><h1>History</h1><p>View all your past conversions</p></div>
-                <div class="activity-section">
-                    <div class="activity-header"><h3 class="section-title" style="margin: 0;">All Conversions</h3><button class="btn btn-danger" onclick="clearAllHistory()"><i class="fas fa-trash"></i> Clear All</button></div>
-                    <div class="activity-list" id="historyList"><div class="empty-state"><i class="fas fa-history"></i><h3>No history yet</h3><p>Your conversion history will appear here</p></div></div>
+            <div class="auth-error" id="authError"></div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-auth" id="loginBtn">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="registerName" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                <button type="submit" class="btn-auth" id="registerBtn">Create Account</button>
+            </form>
+
+            <div class="auth-divider">or continue with</div>
+
+            <div class="social-buttons">
+                <button class="btn-social" onclick="socialAuth('google')">🔍 Google</button>
+                <button class="btn-social" onclick="socialAuth('github')">🐙 GitHub</button>
             </div>
-
-            <!-- SAVED PAGE -->
-            <div class="page" id="page-saved">
-                <div class="page-header"><h1>Saved</h1><p>Your favorite creations</p></div>
-                <div class="content-grid" id="savedGrid"><div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any creation to save it here</p></div></div>
-            </div>
-
-            <!-- MY CONTENT PAGE -->
-            <div class="page" id="page-content">
-                <div class="page-header"><h1>My Content</h1><p>Manage your content library</p></div>
-                <div class="content-grid">
-                    <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Blog Posts</div><div class="content-card-meta">12 items</div></div><i class="fas fa-blog" style="color: var(--primary);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
-                    <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Video Scripts</div><div class="content-card-meta">5 items</div></div><i class="fas fa-video" style="color: var(--secondary);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
-                    <div class="content-card"><div class="content-card-header"><div><div class="content-card-title">Audio Projects</div><div class="content-card-meta">3 items</div></div><i class="fas fa-microphone-alt" style="color: var(--accent);"></i></div><div class="content-card-actions"><button class="btn btn-secondary" style="flex: 1;">View</button><button class="btn btn-primary" style="flex: 1;">Add New</button></div></div>
-                </div>
-            </div>
-
-            <!-- SCHEDULE PAGE -->
-            <div class="page" id="page-schedule">
-                <div class="page-header"><h1>Schedule</h1><p>Plan your content calendar</p></div>
-                <div class="schedule-calendar">
-                    <div class="calendar-header"><h3>April 2026</h3><div><button class="btn btn-secondary" style="margin-right: 8px;"><i class="fas fa-chevron-left"></i></button><button class="btn btn-secondary"><i class="fas fa-chevron-right"></i></button></div></div>
-                    <div class="calendar-grid">
-                        <div class="calendar-day">1</div><div class="calendar-day">2</div><div class="calendar-day">3</div><div class="calendar-day">4</div><div class="calendar-day">5</div><div class="calendar-day">6</div><div class="calendar-day">7</div>
-                        <div class="calendar-day">8</div><div class="calendar-day has-event">9</div><div class="calendar-day">10</div><div class="calendar-day">11</div><div class="calendar-day has-event">12</div><div class="calendar-day">13</div><div class="calendar-day">14</div>
-                        <div class="calendar-day">15</div><div class="calendar-day">16</div><div class="calendar-day">17</div><div class="calendar-day">18</div><div class="calendar-day">19</div><div class="calendar-day">20</div><div class="calendar-day">21</div>
-                        <div class="calendar-day">22</div><div class="calendar-day">23</div><div class="calendar-day">24</div><div class="calendar-day">25</div><div class="calendar-day">26</div><div class="calendar-day">27</div><div class="calendar-day">28</div>
-                        <div class="calendar-day">29</div><div class="calendar-day">30</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANALYTICS PAGE -->
-            <div class="page" id="page-analytics">
-                <div class="page-header"><h1>Analytics</h1><p>Track your content performance</p></div>
-                <div class="analytics-grid">
-                    <div class="analytics-card"><h4>Content Generated</h4><div class="chart-placeholder"><i class="fas fa-chart-line" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                    <div class="analytics-card"><h4>Media Types</h4><div class="chart-placeholder"><i class="fas fa-chart-pie" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                    <div class="analytics-card"><h4>Export Formats</h4><div class="chart-placeholder"><i class="fas fa-chart-bar" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                    <div class="analytics-card"><h4>Time Saved</h4><div class="chart-placeholder"><i class="fas fa-clock" style="font-size: 48px; opacity: 0.5;"></i></div></div>
-                </div>
-            </div>
-
-            <!-- APPEARANCE PAGE -->
-            <div class="page" id="page-appearance">
-                <div class="page-header"><h1>Appearance</h1><p>Customize your dashboard look</p></div>
-                <div class="settings-section"><h3>Theme Color</h3><div class="color-picker"><div class="color-option active" style="background: #6366f1;" onclick="setThemeColor('#6366f1')"></div><div class="color-option" style="background: #ec4899;" onclick="setThemeColor('#ec4899')"></div><div class="color-option" style="background: #10b981;" onclick="setThemeColor('#10b981')"></div><div class="color-option" style="background: #f59e0b;" onclick="setThemeColor('#f59e0b')"></div><div class="color-option" style="background: #06b6d4;" onclick="setThemeColor('#06b6d4')"></div></div></div>
-                <div class="settings-section">
-                    <h3>Display Settings</h3>
-                    <div class="setting-item"><div class="setting-info"><h4>Compact Mode</h4><p>Reduce padding and spacing</p></div><div class="toggle" onclick="toggleSetting(this)"></div></div>
-                    <div class="setting-item"><div class="setting-info"><h4>Animations</h4><p>Enable smooth transitions</p></div><div class="toggle active" onclick="toggleSetting(this)"></div></div>
-                    <div class="setting-item"><div class="setting-info"><h4>Background Effects</h4><p>Show animated background</p></div><div class="toggle active" onclick="toggleSetting(this)"></div></div>
-                </div>
-            </div>
-
-            <!-- ACCOUNT PAGE -->
-            <div class="page" id="page-account">
-                <div class="page-header"><h1>Account</h1><p>Manage your profile and settings</p></div>
-                <div class="settings-section">
-                    <h3>Profile Information</h3>
-                    <div class="input-group"><label class="input-label">Display Name</label><input type="text" class="input-field" value="Content Creator" id="displayName"></div>
-                    <div class="input-group"><label class="input-label">Email</label><input type="email" class="input-field" value="user@example.com" id="userEmail"></div>
-                    <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
-                </div>
-                <div class="settings-section">
-                    <h3>Subscription</h3>
-                    <div class="setting-item"><div class="setting-info"><h4>Current Plan</h4><p>Free Tier - 100 conversions/month</p></div><button class="btn btn-primary">Upgrade</button></div>
-                </div>
-            </div>
-
-            <!-- API KEYS PAGE -->
-            <div class="page" id="page-api">
-                <div class="page-header"><h1>API Keys</h1><p>Manage your API connections</p></div>
-                <div class="settings-section">
-                    <h3>Groq AI API Key</h3>
-                    <div class="input-group"><label class="input-label">API Key</label><input type="password" class="input-field" id="apiKeyPageInput" placeholder="Enter your Groq API key..."></div>
-                    <div style="display: flex; gap: 12px;"><button class="btn btn-primary" onclick="saveApiKeyFromPage()"><i class="fas fa-save"></i> Save API Key</button><button class="btn btn-secondary" onclick="testApiFromPage()"><i class="fas fa-vial"></i> Test Connection</button></div>
-                    <p style="margin-top: 16px; font-size: 13px; color: var(--text-muted);"><i class="fas fa-info-circle"></i> Get your free API key at <a href="https://console.groq.com" target="_blank" style="color: var(--primary);">console.groq.com</a></p>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Enhanced Tool Modal with Multimedia -->
-    <div class="modal-overlay" id="toolModal">
-        <div class="modal">
-            <div class="modal-header"><h3 class="modal-title" id="modalTitle">Convert Content</h3><button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button></div>
-            <div class="modal-body">
-                <div class="input-group"><label class="input-label">Input Content <span id="inputHint" style="color: var(--text-muted); font-weight: 400;"></span></label><textarea class="input-field" id="modalInput" placeholder="Paste your content here..."></textarea></div>
-                <div class="settings-row">
-                    <div><label class="input-label">Tone</label><select class="select-field" id="toneSelect"><option value="professional">Professional</option><option value="casual">Casual</option><option value="witty">Witty</option><option value="inspirational">Inspirational</option><option value="authoritative">Authoritative</option></select></div>
-                    <div><label class="input-label">Length</label><select class="select-field" id="lengthSelect"><option value="short">Short</option><option value="medium" selected>Medium</option><option value="long">Long</option></select></div>
-                    <div id="formatSelectContainer"><label class="input-label">Output Format</label><select class="select-field" id="formatSelect"><option value="text">Text Only</option><option value="image">With Image</option><option value="audio">With Audio</option><option value="all">All Formats</option></select></div>
-                </div>
-
-                <!-- Output Tabs -->
-                <div class="output-tabs" id="outputTabs" style="display: none;">
-                    <button class="output-tab active" onclick="switchOutputTab('text')" id="tab-text"><i class="fas fa-font"></i> Text</button>
-                    <button class="output-tab" onclick="switchOutputTab('image')" id="tab-image" style="display: none;"><i class="fas fa-image"></i> Image</button>
-                    <button class="output-tab" onclick="switchOutputTab('audio')" id="tab-audio" style="display: none;"><i class="fas fa-music"></i> Audio</button>
-                    <button class="output-tab" onclick="switchOutputTab('video')" id="tab-video" style="display: none;"><i class="fas fa-video"></i> Video</button>
-                </div>
-
-                <!-- Text Output -->
-                <div class="output-section" id="outputSectionText" style="display: none;">
-                    <div class="output-header"><span class="output-label">Generated Text</span><div class="output-actions"><button class="btn-icon" onclick="copyOutput()"><i class="fas fa-copy"></i> Copy</button><button class="btn-icon" onclick="downloadText()"><i class="fas fa-download"></i> TXT</button></div></div>
-                    <div class="output-content" id="outputContentText"></div>
-                </div>
-
-                <!-- Image Output -->
-                <div class="output-section" id="outputSectionImage" style="display: none;">
-                    <div class="output-header"><span class="output-label">Generated Images</span><div class="output-actions"><button class="btn-icon" onclick="downloadAllImages()"><i class="fas fa-download"></i> All</button></div></div>
-                    <div class="image-grid" id="imageGrid"></div>
-                </div>
-
-                <!-- Audio Output -->
-                <div class="output-section" id="outputSectionAudio" style="display: none;">
-                    <div class="output-header"><span class="output-label">Generated Audio</span><div class="output-actions"><button class="btn-icon" onclick="downloadAudio()"><i class="fas fa-download"></i> MP3</button></div></div>
-                    <div class="audio-player" id="audioPlayer">
-                        <button class="btn-icon" onclick="toggleAudio()" id="playBtn"><i class="fas fa-play"></i></button>
-                        <div class="audio-waveform" id="audioWaveform"></div>
-                        <span style="font-size: 12px; color: var(--text-muted);">0:00 / 0:00</span>
-                    </div>
-                </div>
-
-                <!-- Video Output -->
-                <div class="output-section" id="outputSectionVideo" style="display: none;">
-                    <div class="output-header"><span class="output-label">Video Preview</span><div class="output-actions"><button class="btn-icon" onclick="downloadVideo()"><i class="fas fa-download"></i> MP4</button></div></div>
-                    <div class="video-thumbnail" id="videoThumbnail"></div>
-                </div>
-
-                <!-- Export Options -->
-                <div class="export-options" id="exportOptions" style="display: none;">
-                    <div class="export-option" onclick="exportContent('pdf')"><i class="fas fa-file-pdf"></i><div class="export-option-title">Export PDF</div><div class="export-option-desc">Document format</div></div>
-                    <div class="export-option" onclick="exportContent('html')"><i class="fas fa-file-code"></i><div class="export-option-title">Export HTML</div><div class="export-option-desc">Web format</div></div>
-                    <div class="export-option" onclick="exportContent('markdown')"><i class="fab fa-markdown"></i><div class="export-option-title">Export MD</div><div class="export-option-desc">Markdown format</div></div>
-                </div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="loadSample()"><i class="fas fa-magic"></i> Load Sample</button><button class="btn btn-primary" id="convertBtn" onclick="performConversion()"><i class="fas fa-bolt"></i> Generate Content</button></div>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- ========================================
+         MAIN APPLICATION (Your Structure)
+         ======================================== -->
+    <div class="app-container" id="appContainer">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="brand">⚡ RepurposeAI</div>
+            <div class="header-actions">
+                <div class="user-widget" onclick="toggleDropdown(event)">
+                    <div class="user-avatar" id="headerAvatar">?</div>
+                    <div class="user-meta">
+                        <span class="user-name" id="headerName">Guest</span>
+                        <span class="user-email" id="headerEmail">Sign in to save</span>
+                    </div>
+
+                    <div class="dropdown-menu" id="userDropdown">
+                        <div class="dropdown-item" onclick="showProfile()">👤 Profile</div>
+                        <div class="dropdown-item" onclick="showSettings()">⚙️ Settings</div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="handleLogout()">🚪 Sign Out</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar-left">
+            <div class="section-title">Overview</div>
+
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <div class="stat-number" id="statConversions">0</div>
+                    <div class="stat-label-small">Conversions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTime">0</div>
+                    <div class="stat-label-small">Hours Saved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statMedia">0</div>
+                    <div class="stat-label-small">Media Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statFormats">0</div>
+                    <div class="stat-label-small">Formats</div>
+                </div>
+            </div>
+
+            <div class="section-title">Quick Actions</div>
+            <div class="quick-actions">
+                <button class="action-btn active" onclick="showSection('convert')">
+                    <span>🔄</span> Convert Video
+                </button>
+                <button class="action-btn" onclick="showSection('history')">
+                    <span>📚</span> History
+                </button>
+                <button class="action-btn" onclick="showSection('saved')">
+                    <span>⭐</span> Saved Items
+                </button>
+            </div>
+
+            <div class="section-title">Recent</div>
+            <div id="recentList">
+                <p style="color: var(--text-muted); font-size: 0.875rem;">No conversions yet</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Convert Section -->
+            <div class="tools-section active" id="convertSection">
+                <div class="content-header">
+                    <h2>🎯 Smart Link Generator</h2>
+                    <p>Upload a video to get AI-powered tool recommendations</p>
+                </div>
+
+                <!-- DRAG & DROP UPLOAD -->
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" class="file-input" accept="video/*" onchange="handleFileSelect(event)">
+
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon-large">📁</div>
+                        <div class="upload-text">
+                            <h3>Drop your video here</h3>
+                            <p>MP4, MOV, MKV up to 2GB • Drag & drop or click to browse</p>
+                        </div>
+                    </div>
+
+                    <div class="file-display" id="fileDisplay">
+                        <div class="file-thumb">🎬</div>
+                        <div class="file-info-text">
+                            <div class="name" id="displayFileName">video.mp4</div>
+                            <div class="meta" id="displayFileMeta">0 MB • 0:00</div>
+                        </div>
+                        <div class="remove-btn" onclick="removeFile(event)">✕</div>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="category-filters">
+                    <button class="filter-btn active" onclick="filterCategory('all')">All Tools</button>
+                    <button class="filter-btn" onclick="filterCategory('shorts')">Short Clips</button>
+                    <button class="filter-btn" onclick="filterCategory('audio')">Audio</button>
+                    <button class="filter-btn" onclick="filterCategory('design')">Thumbnails</button>
+                    <button class="filter-btn" onclick="filterCategory('text')">Blog/Text</button>
+                    <button class="filter-btn" onclick="filterCategory('ai-image')">🎨 AI Images</button>
+                </div>
+
+                <!-- Tools Grid -->
+                <div class="tools-grid" id="toolsGrid"></div>
+            </div>
+
+            <!-- History Section -->
+            <div class="tools-section" id="historySection">
+                <div class="content-header">
+                    <h2>📚 Conversion History</h2>
+                    <p>Your recent video processing activity</p>
+                </div>
+                <div id="historyContent">
+                    <p style="color: var(--text-muted);">No history yet. Upload a video to get started!</p>
+                </div>
+            </div>
+
+            <!-- Saved Section -->
+            <div class="tools-section" id="savedSection">
+                <div class="content-header">
+                    <h2>⭐ Saved Items</h2>
+                    <p>Your favorite tools and templates</p>
+                </div>
+                <div id="savedContent">
+                    <p style="color: var(--text-muted);">Click the star icon on any tool to save it here</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar-right">
+            <div class="settings-group">
+                <h4>🎨 Theme Settings</h4>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Compact Mode</div>
+                        <div class="setting-desc">Reduce padding and spacing</div>
+                    </div>
+                    <div class="toggle" id="compactToggle" onclick="toggleSetting(this)"></div>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Animations</div>
+                        <div class="setting-desc">Enable smooth transitions</div>
+                    </div>
+                    <div class="toggle active" id="animToggle" onclick="toggleSetting(this)"></div>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label">Background Effects</div>
+                        <div class="setting-desc">Show animated background</div>
+                    </div>
+                    <div class="toggle" id="bgToggle" onclick="toggleSetting(this)"></div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h4>👤 Profile Information</h4>
+                <div class="setting-item">
+                    <div>
+                        <div class="setting-label" id="profileName">Display Name</div>
+                        <div class="setting-desc" id="profileEmail">email@example.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h4>💎 Subscription</h4>
+                <div class="subscription-box">
+                    <span class="plan-badge" id="planBadge">Free Tier</span>
+                    <div style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+                        <span id="usageCount">0</span> / <span id="usageLimit">100</span> conversions
+                    </div>
+                    <div class="usage-bar">
+                        <div class="usage-fill" id="usageBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage">Operation successful</span>
+    </div>
 
     <script>
-        // State Management
-        const state = {
-            apiKey: localStorage.getItem('groqApiKey') || '',
-            currentTool: null,
-            isProcessing: false,
-            conversions: JSON.parse(localStorage.getItem('conversions') || '[]'),
-            saved: JSON.parse(localStorage.getItem('saved') || '[]'),
-            media: JSON.parse(localStorage.getItem('media') || '[]'),
-            usage: parseInt(localStorage.getItem('usage') || '0'),
-            totalChars: parseInt(localStorage.getItem('totalChars') || '0'),
-            currentPage: 'dashboard',
-            currentOutputTab: 'text',
-            generatedImages: [],
-            generatedAudio: null
+        // ========================================
+        // SUPABASE CONFIG - REPLACE WITH YOURS
+        // ========================================
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+
+        let supabaseClient = null;
+        let currentUser = null;
+        let currentFile = null;
+        let currentCategory = 'all';
+
+        // Initialize if credentials provided
+        if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes('your-project')) {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        // ========================================
+        // TOOL DATABASE - ALL SMART LINKS + AI IMAGE GEN
+        // ========================================
+        const toolsDB = {
+            shorts: [
+                {
+                    id: 'capcut',
+                    name: 'CapCut',
+                    icon: '✂️',
+                    category: 'shorts',
+                    action: 'Auto-Captions',
+                    description: 'AI auto-captions, trending effects, noise removal. Best viral clips.',
+                    url: 'https://www.capcut.com/tools/video-to-text',
+                    timeSaved: 20,
+                    prompt: 'Add auto-captions with trending font, remove silent parts, enhance colors',
+                    color: '#00c6ff'
+                },
+                {
+                    id: 'canva-video',
+                    name: 'Canva Video',
+                    icon: '🎨',
+                    category: 'shorts',
+                    action: 'Shorts Templates',
+                    description: '1000+ vertical templates. Drag-drop video, auto-resize.',
+                    url: 'https://www.canva.com/design?create&type=11',
+                    timeSaved: 15,
+                    prompt: 'Create 3 short clips using trending template with bold text overlays',
+                    color: '#00c4cc'
+                },
+                {
+                    id: 'clipchamp',
+                    name: 'Clipchamp',
+                    icon: '🎬',
+                    category: 'shorts',
+                    action: 'Auto-Compose',
+                    description: 'Microsoft AI detects highlights, auto-cuts, adds music.',
+                    url: 'https://clipchamp.com/en/',
+                    timeSaved: 18,
+                    prompt: 'Auto-create highlights reel with smart cuts and captions',
+                    color: '#5c2d91'
+                }
+            ],
+            audio: [
+                {
+                    id: 'adobe-podcast',
+                    name: 'Adobe Podcast',
+                    icon: '🎙️',
+                    category: 'audio',
+                    action: 'Enhance Speech',
+                    description: 'Studio-quality audio in one click. Removes noise, echo.',
+                    url: 'https://podcast.adobe.com/enhance',
+                    timeSaved: 30,
+                    prompt: 'Upload audio file for studio-quality enhancement',
+                    color: '#ff0000'
+                },
+                {
+                    id: 'descript',
+                    name: 'Descript',
+                    icon: '📝',
+                    category: 'audio',
+                    action: 'Transcribe & Edit',
+                    description: 'Edit audio by editing text. Remove filler words auto.',
+                    url: 'https://web.descript.com/new',
+                    timeSaved: 45,
+                    prompt: 'Transcribe and remove filler words (ums, ahs) automatically',
+                    color: '#40e0d0'
+                },
+                {
+                    id: 'vocal-remover',
+                    name: 'Vocal Remover',
+                    icon: '🎵',
+                    category: 'audio',
+                    action: 'Separate Audio',
+                    description: 'Isolate voice or music. Free, no signup needed.',
+                    url: 'https://vocalremover.org/',
+                    timeSaved: 10,
+                    prompt: 'Separate voice from background noise/music',
+                    color: '#ff6b6b'
+                }
+            ],
+            design: [
+                {
+                    id: 'canva-thumb',
+                    name: 'Canva',
+                    icon: '🖼️',
+                    category: 'design',
+                    action: 'Thumbnails',
+                    description: '1280×720 YouTube templates. 1000+ click-worthy designs.',
+                    url: 'https://www.canva.com/design?create&type=10',
+                    timeSaved: 25,
+                    prompt: 'Create 3 thumbnail variations: shocked face, curiosity gap, comparison',
+                    color: '#00c4cc'
+                },
+                {
+                    id: 'remove-bg',
+                    name: 'Remove.bg',
+                    icon: '✂️',
+                    category: 'design',
+                    action: 'Remove BG',
+                    description: 'One-click background removal. Clean cutouts.',
+                    url: 'https://www.remove.bg/',
+                    timeSaved: 8,
+                    prompt: 'Remove background from subject for clean thumbnail cutout',
+                    color: '#00d084'
+                },
+                {
+                    id: 'adobe-express',
+                    name: 'Adobe Express',
+                    icon: '⭐',
+                    category: 'design',
+                    action: 'Quick Thumbs',
+                    description: 'AI-generated backgrounds, text effects, fast export.',
+                    url: 'https://www.adobe.com/express/create/thumbnail',
+                    timeSaved: 20,
+                    prompt: 'Generate thumbnail with AI background and bold headline',
+                    color: '#ff0000'
+                }
+            ],
+            text: [
+                {
+                    id: 'chatgpt',
+                    name: 'ChatGPT',
+                    icon: '🤖',
+                    category: 'text',
+                    action: 'Blog Post',
+                    description: 'Transcript → SEO article. Headings, keywords, quotes.',
+                    url: 'https://chat.openai.com',
+                    timeSaved: 60,
+                    prompt: 'Convert this video transcript to a 1000-word blog post with H2 headings, key takeaways box, and SEO keywords. Include 3 pull quotes for social media.',
+                    color: '#10a37f'
+                },
+                {
+                    id: 'notion',
+                    name: 'Notion',
+                    icon: '📄',
+                    category: 'text',
+                    action: 'Content Calendar',
+                    description: 'Schedule posts, track status, organize assets.',
+                    url: 'https://www.notion.so/pages/new',
+                    timeSaved: 30,
+                    prompt: 'Create content calendar with repurposed assets from this video',
+                    color: '#000000'
+                },
+                {
+                    id: 'hemingway',
+                    name: 'Hemingway',
+                    icon: '📖',
+                    category: 'text',
+                    action: 'Readability',
+                    description: 'Simplify complex sentences. Grade level checker.',
+                    url: 'http://www.hemingwayapp.com/',
+                    timeSaved: 15,
+                    prompt: 'Check readability grade level and simplify complex sentences',
+                    color: '#f4a261'
+                }
+            ],
+            'ai-image': [
+                {
+                    id: 'midjourney',
+                    name: 'Midjourney',
+                    icon: '🎨',
+                    category: 'ai-image',
+                    action: 'Generate Art',
+                    description: 'AI image generation from text prompts. Stunning visuals.',
+                    url: 'https://www.midjourney.com/',
+                    timeSaved: 120,
+                    prompt: 'Create thumbnail background: [describe video topic], vibrant colors, cinematic lighting, 16:9, professional, eye-catching',
+                    color: '#1a1a2e'
+                },
+                {
+                    id: 'dalle',
+                    name: 'DALL·E 3',
+                    icon: '🖼️',
+                    category: 'ai-image',
+                    action: 'AI Images',
+                    description: 'ChatGPT-integrated image gen. Edit existing images.',
+                    url: 'https://chat.openai.com',
+                    timeSaved: 90,
+                    prompt: 'Generate 3 thumbnail concepts for video about [topic]: 1) Shocked reaction style, 2) Curiosity gap style, 3) Comparison split-screen style',
+                    color: '#10a37f'
+                },
+                {
+                    id: 'leonardo',
+                    name: 'Leonardo.ai',
+                    icon: '🎭',
+                    category: 'ai-image',
+                    action: 'Free AI Art',
+                    description: '150 free credits/day. Great for thumbnails, banners.',
+                    url: 'https://leonardo.ai/',
+                    timeSaved: 60,
+                    prompt: 'Create YouTube thumbnail: [topic], bold colors, text space, 1280x720, professional photography style',
+                    color: '#6366f1'
+                },
+                {
+                    id: 'ideogram',
+                    name: 'Ideogram',
+                    icon: '✨',
+                    category: 'ai-image',
+                    action: 'Text in Images',
+                    description: 'Best for images WITH text. Free, no watermark.',
+                    url: 'https://ideogram.ai/',
+                    timeSaved: 45,
+                    prompt: 'Thumbnail with text "[VIDEO TITLE]", bold typography, [topic] imagery, 16:9, vibrant',
+                    color: '#ec4899'
+                },
+                {
+                    id: 'bing-image',
+                    name: 'Bing Image Creator',
+                    icon: '🔍',
+                    category: 'ai-image',
+                    action: 'Free DALL·E',
+                    description: 'Microsoft's free DALL·E. 15 boosts/day, then slow.',
+                    url: 'https://www.bing.com/create',
+                    timeSaved: 60,
+                    prompt: 'YouTube thumbnail, [topic], professional, high contrast, clickable',
+                    color: '#00809d'
+                },
+                {
+                    id: 'canva-ai',
+                    name: 'Canva AI',
+                    icon: '🎨',
+                    category: 'ai-image',
+                    action: 'Magic Media',
+                    description: 'Text-to-image inside Canva. Integrated workflow.',
+                    url: 'https://www.canva.com/magic/',
+                    timeSaved: 30,
+                    prompt: 'Generate image: [describe scene], suitable for video thumbnail, eye-catching',
+                    color: '#00c4cc'
+                }
+            ]
         };
 
-        // Tool Configurations with Multimedia Support
-        const tools = {
-            'blog-to-twitter': {
-                title: 'Blog to Twitter Thread',
-                icon: 'fab fa-twitter',
-                hint: '(Paste blog post text)',
-                supports: ['text', 'image'],
-                sampleInput: `10 AI Tools That Will 10x Your Content Creation Workflow in 2024
+        // ========================================
+        // AUTH FUNCTIONS
+        // ========================================
 
-Artificial intelligence is revolutionizing how creators work.`,
-                systemPrompt: (tone, length) => `Convert blog post to Twitter thread.
-
-Tone: ${tone}
-Length: ${length}
-
-Requirements:
-- Strong hook tweet
-- 280-char chunks
-- Number tweets
-- Emojis
-- Call-to-action`,
-                imagePrompt: (text) => `Create a social media graphic for Twitter about: ${text.substring(0, 100)}... Style: Modern, bold typography, gradient background`
-            },
-            'video-to-blog': {
-                title: 'Video to Blog Article',
-                icon: 'fab fa-youtube',
-                hint: '(Paste video transcript)',
-                supports: ['text', 'image'],
-                sampleInput: `Today I want to talk about building a personal brand on LinkedIn in 2024.`,
-                systemPrompt: (tone, length) => `Convert video transcript to blog article.
-
-Tone: ${tone}
-Length: ${length}
-
-Requirements:
-- SEO title
-- Engaging intro
-- Clear headings
-- Key takeaways
-- Call-to-action`,
-                imagePrompt: (text) => `Blog header image about: ${text.substring(0, 100)}... Style: Professional, clean, modern`
-            },
-            'image-quotes': {
-                title: 'Quote Images',
-                icon: 'fas fa-image',
-                hint: '(Paste quote or text)',
-                supports: ['text', 'image'],
-                sampleInput: `Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill`,
-                systemPrompt: (tone, length) => `Create quote image variations.
-
-Tone: ${tone}
-
-Requirements:
-- Extract core message
-- 3 design variations
-- Color palette suggestions
-- Font pairings
-- Dimensions for social platforms`,
-                imagePrompt: (text) => `Quote graphic: "${text.substring(0, 150)}" Style: Elegant typography, inspirational, shareable`
-            },
-            'text-to-speech': {
-                title: 'Text to Speech',
-                icon: 'fas fa-microphone-alt',
-                hint: '(Paste text to convert to audio)',
-                supports: ['text', 'audio'],
-                sampleInput: `Welcome to our podcast! Today we're discussing the future of AI in content creation.`,
-                systemPrompt: (tone, length) => `Optimize text for speech.
-
-Tone: ${tone}
-
-Requirements:
-- Natural pauses
-- Proper pronunciation hints
-- Emphasis markers
-- Breathing points`,
-                audioScript: (text) => text
-            },
-            'social-carousel': {
-                title: 'Social Carousel',
-                icon: 'fas fa-images',
-                hint: '(Topic for carousel slides)',
-                supports: ['text', 'image'],
-                sampleInput: `5 Tips for Better Sleep`,
-                systemPrompt: (tone, length) => `Create Instagram carousel content.
-
-Tone: ${tone}
-Length: ${length}
-
-Requirements:
-- 5-7 slides
-- Hook slide
-- Educational content
-- Call-to-action slide`,
-                imagePrompt: (text) => `Instagram carousel slide about: ${text.substring(0, 80)}... Style: Instagram aesthetic, bold colors, swipeable`
-            },
-            'video-script': {
-                title: 'Video Script + Thumbnail',
-                icon: 'fas fa-video',
-                hint: '(Video topic or outline)',
-                supports: ['text', 'image', 'video'],
-                sampleInput: `How to Start a YouTube Channel in 2024`,
-                systemPrompt: (tone, length) => `Create YouTube video script.
-
-Tone: ${tone}
-Length: ${length}
-
-Requirements:
-- Hook (0-30s)
-- Intro
-- Main content sections
-- Outro with CTA`,
-                imagePrompt: (text) => `YouTube thumbnail: ${text.substring(0, 80)}... Style: Clickbait, high contrast, face visible, text overlay`
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (supabaseClient) {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    enterApp();
+                }
             }
-        };
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            checkApiKey();
-            updateStats();
-            renderActivityList();
-            renderHistoryList();
-            renderSavedList();
-            renderMediaGallery();
+            // Setup drag & drop
+            setupDragDrop();
+            renderTools();
+            loadStats();
         });
 
-        // Navigation
-        function navigateTo(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`page-${page}`).classList.add('active');
-            const navItem = document.querySelector(`[data-page="${page}"]`);
-            if (navItem) navItem.classList.add('active');
-            state.currentPage = page;
-            if (page === 'history') renderHistoryList();
-            if (page === 'saved') renderSavedList();
-            if (page === 'media') renderMediaGallery();
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            hideError();
         }
 
-        // API Key Management
-        function checkApiKey() {
-            if (state.apiKey) {
-                document.getElementById('apiSetupBanner').classList.add('hidden');
-                document.getElementById('apiKeyInput').value = state.apiKey;
-                const pageInput = document.getElementById('apiKeyPageInput');
-                if (pageInput) pageInput.value = state.apiKey;
-                updateApiStatus(true);
-                updateUsageDisplay();
-            } else {
-                document.getElementById('apiSetupBanner').classList.remove('hidden');
-                updateApiStatus(false);
-            }
-        }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
 
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) { showToast('Please enter a valid API key', 'error'); return; }
-            if (!key.startsWith('gsk_')) { showToast('Invalid API key format', 'error'); return; }
-            state.apiKey = key;
-            localStorage.setItem('groqApiKey', key);
-            document.getElementById('apiSetupBanner').classList.add('hidden');
-            updateApiStatus(true);
-            showToast('API key saved!', 'success');
-            testApiConnection();
-        }
-
-        function saveApiKeyFromPage() {
-            const key = document.getElementById('apiKeyPageInput').value.trim();
-            if (!key) { showToast('Please enter a valid API key', 'error'); return; }
-            if (!key.startsWith('gsk_')) { showToast('Invalid API key format', 'error'); return; }
-            state.apiKey = key;
-            localStorage.setItem('groqApiKey', key);
-            document.getElementById('apiKeyInput').value = key;
-            updateApiStatus(true);
-            showToast('API key saved!', 'success');
-        }
-
-        function updateApiStatus(connected) {
-            const statusEl = document.getElementById('apiStatus');
-            if (!statusEl) return;
-            if (connected) {
-                statusEl.classList.remove('disconnected');
-                statusEl.classList.add('connected');
-                statusEl.innerHTML = '<i class="fas fa-circle" style="font-size: 8px;"></i><span>Connected</span>';
-            } else {
-                statusEl.classList.remove('connected');
-                statusEl.classList.add('disconnected');
-                statusEl.innerHTML = '<i class="fas fa-circle" style="font-size: 8px;"></i><span>Disconnected</span>';
-            }
-        }
-
-        async function testApiConnection() {
-            try {
-                const response = await fetch('https://api.groq.com/openai/v1/models', {
-                    headers: { 'Authorization': `Bearer ${state.apiKey}` }
-                });
-                if (response.ok) showToast('Connected to Groq AI!', 'success');
-                else throw new Error('Invalid key');
-            } catch (error) {
-                showToast('Failed to connect', 'error');
-                updateApiStatus(false);
-            }
-        }
-
-        function testApiFromPage() { testApiConnection(); }
-
-        // Modal Management
-        function openToolModal(toolId) {
-            if (!state.apiKey) {
-                showToast('Please add your API key first', 'warning');
+            if (!supabaseClient) {
+                // Demo mode
+                btn.innerHTML = '<span class="spinner"></span> Signing in...';
+                setTimeout(() => {
+                    currentUser = { 
+                        email: document.getElementById('loginEmail').value,
+                        user_metadata: { full_name: 'Demo User' }
+                    };
+                    enterApp();
+                }, 1000);
                 return;
             }
-            state.currentTool = toolId;
-            const tool = tools[toolId];
-            document.getElementById('modalTitle').innerHTML = `<i class="${tool.icon}" style="margin-right: 10px;"></i>${tool.title}`;
-            document.getElementById('inputHint').textContent = tool.hint;
-            document.getElementById('modalInput').value = '';
-            document.getElementById('modalInput').placeholder = tool.hint.replace(/[()]/g, '');
 
-            // Reset outputs
-            document.getElementById('outputTabs').style.display = 'none';
-            document.getElementById('outputSectionText').style.display = 'none';
-            document.getElementById('outputSectionImage').style.display = 'none';
-            document.getElementById('outputSectionAudio').style.display = 'none';
-            document.getElementById('outputSectionVideo').style.display = 'none';
-            document.getElementById('exportOptions').style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Signing in...';
 
-            // Show/hide format selector based on tool
-            const formatContainer = document.getElementById('formatSelectContainer');
-            if (tool.supports.length > 1) formatContainer.style.display = 'block';
-            else formatContainer.style.display = 'none';
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            });
 
-            document.getElementById('convertBtn').disabled = false;
-            document.getElementById('convertBtn').innerHTML = '<i class="fas fa-bolt"></i> Generate Content';
-            document.getElementById('toolModal').classList.add('active');
+            if (error) {
+                showError(error.message);
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            } else {
+                currentUser = data.user;
+                enterApp();
+            }
         }
 
-        function closeModal() {
-            document.getElementById('toolModal').classList.remove('active');
-            state.currentTool = null;
-            state.isProcessing = false;
-            state.generatedImages = [];
-            state.generatedAudio = null;
-        }
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = document.getElementById('registerBtn');
 
-        function loadSample() {
-            if (!state.currentTool) return;
-            const tool = tools[state.currentTool];
-            document.getElementById('modalInput').value = tool.sampleInput;
-            showToast('Sample loaded!', 'success');
-        }
+            if (!supabaseClient) {
+                btn.innerHTML = '<span class="spinner"></span> Creating...';
+                setTimeout(() => {
+                    currentUser = {
+                        email: document.getElementById('registerEmail').value,
+                        user_metadata: { full_name: document.getElementById('registerName').value }
+                    };
+                    enterApp();
+                }, 1000);
+                return;
+            }
 
-        // Output Tab Switching
-        function switchOutputTab(tab) {
-            state.currentOutputTab = tab;
-            document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Creating...';
 
-            document.getElementById('outputSectionText').style.display = tab === 'text' ? 'block' : 'none';
-            document.getElementById('outputSectionImage').style.display = tab === 'image' ? 'block' : 'none';
-            document.getElementById('outputSectionAudio').style.display = tab === 'audio' ? 'block' : 'none';
-            document.getElementById('outputSectionVideo').style.display = tab === 'video' ? 'block' : 'none';
-        }
-
-        // Main Conversion Function
-        async function performConversion() {
-            if (!state.currentTool || state.isProcessing) return;
-            const input = document.getElementById('modalInput').value.trim();
-            if (!input) { showToast('Please enter content', 'error'); return; }
-
-            state.isProcessing = true;
-            const tool = tools[state.currentTool];
-            const tone = document.getElementById('toneSelect').value;
-            const length = document.getElementById('lengthSelect').value;
-            const format = document.getElementById('formatSelect').value;
-
-            const convertBtn = document.getElementById('convertBtn');
-            convertBtn.disabled = true;
-            convertBtn.innerHTML = '<div class="spinner"></div> Generating...';
-
-            try {
-                // Generate text content
-                const textResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${state.apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        messages: [
-                            { role: 'system', content: tool.systemPrompt(tone, length) },
-                            { role: 'user', content: input }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 4096
-                    })
-                });
-
-                if (!textResponse.ok) throw new Error('Text generation failed');
-                const textData = await textResponse.json();
-                const generatedText = textData.choices[0].message.content;
-
-                // Show text output
-                document.getElementById('outputTabs').style.display = 'flex';
-                document.getElementById('tab-text').style.display = 'flex';
-                document.getElementById('outputSectionText').style.display = 'block';
-                document.getElementById('outputContentText').textContent = generatedText;
-
-                // Generate multimedia based on format selection
-                if ((format === 'image' || format === 'all') && tool.supports.includes('image')) {
-                    await generateImages(tool.imagePrompt(input));
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value,
+                options: {
+                    data: { full_name: document.getElementById('registerName').value }
                 }
+            });
 
-                if ((format === 'audio' || format === 'all') && tool.supports.includes('audio')) {
-                    await generateAudio(input);
+            if (error) {
+                showError(error.message);
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            } else {
+                currentUser = data.user;
+                showToast('✅ Check your email to confirm!');
+                enterApp();
+            }
+        }
+
+        async function socialAuth(provider) {
+            if (!supabaseClient) {
+                showError('Supabase not configured. Please add your credentials.');
+                return;
+            }
+
+            await supabaseClient.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: window.location.origin
                 }
+            });
+        }
 
-                if ((format === 'all') && tool.supports.includes('video')) {
-                    await generateVideoThumbnail(tool.imagePrompt(input));
+        function enterApp() {
+            document.getElementById('authOverlay').classList.add('hidden');
+            document.getElementById('appContainer').classList.add('active');
+
+            // Update user info
+            const name = currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || 'User';
+            const email = currentUser?.email || 'user@example.com';
+            const initials = name.substring(0, 2).toUpperCase();
+
+            document.getElementById('headerName').textContent = name;
+            document.getElementById('headerEmail').textContent = email;
+            document.getElementById('headerAvatar').textContent = initials;
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileEmail').textContent = email;
+
+            loadUserStats();
+        }
+
+        async function handleLogout() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            currentUser = null;
+            document.getElementById('authOverlay').classList.remove('hidden');
+            document.getElementById('appContainer').classList.remove('active');
+            hideDropdown();
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('authError');
+            err.textContent = msg;
+            err.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('authError').classList.remove('show');
+        }
+
+        // ========================================
+        // DRAG & DROP + FILE HANDLING
+        // ========================================
+
+        function setupDragDrop() {
+            const zone = document.getElementById('uploadZone');
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].type.startsWith('video/')) {
+                    processFile(files[0]);
+                } else {
+                    showToast('❌ Please drop a video file');
                 }
+            });
+        }
 
-                // Show export options
-                document.getElementById('exportOptions').style.display = 'grid';
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) processFile(file);
+        }
 
-                // Update stats
-                state.usage++;
-                state.totalChars += input.length + generatedText.length;
-                localStorage.setItem('usage', state.usage);
-                localStorage.setItem('totalChars', state.totalChars);
+        function processFile(file) {
+            currentFile = file;
+
+            // Show file in upload zone
+            document.getElementById('uploadContent').style.display = 'none';
+            document.getElementById('fileDisplay').classList.add('show');
+            document.getElementById('uploadZone').classList.add('has-file');
+
+            document.getElementById('displayFileName').textContent = file.name;
+
+            // Get video duration
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = () => {
+                window.URL.revokeObjectURL(video.src);
+                const duration = formatDuration(video.duration);
+                const size = formatBytes(file.size);
+                document.getElementById('displayFileMeta').textContent = `${size} • ${duration}`;
 
                 // Save to history
-                addToHistory(tool.title, input.substring(0, 50) + '...', generatedText);
+                saveToHistory(file.name, duration);
+                updateStatsDisplay();
+            };
+            video.src = URL.createObjectURL(file);
 
-                // Add to media gallery
-                addToMediaGallery(tool.title, generatedText, tool.supports);
-
-                updateStats();
-                updateUsageDisplay();
-                showToast('Content generated successfully!', 'success');
-
-            } catch (error) {
-                showToast('Generation failed: ' + error.message, 'error');
-            } finally {
-                state.isProcessing = false;
-                convertBtn.disabled = false;
-                convertBtn.innerHTML = '<i class="fas fa-redo"></i> Generate Again';
-            }
+            showToast('✅ File ready! Choose a tool below');
         }
 
-        // Image Generation (Simulated with Canvas)
-        async function generateImages(prompt) {
-            document.getElementById('tab-image').style.display = 'flex';
-            const imageGrid = document.getElementById('imageGrid');
-            imageGrid.innerHTML = '';
+        function removeFile(e) {
+            e.stopPropagation();
+            currentFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadContent').style.display = 'block';
+            document.getElementById('fileDisplay').classList.remove('show');
+            document.getElementById('uploadZone').classList.remove('has-file');
+        }
 
-            // Generate 2 sample images using Canvas
-            for (let i = 0; i < 2; i++) {
-                const canvas = document.createElement('canvas');
-                canvas.width = 400;
-                canvas.height = 400;
-                const ctx = canvas.getContext('2d');
+        // ========================================
+        // TOOLS RENDERING
+        // ========================================
 
-                // Create gradient background
-                const gradient = ctx.createLinearGradient(0, 0, 400, 400);
-                gradient.addColorStop(0, i === 0 ? '#6366f1' : '#ec4899');
-                gradient.addColorStop(1, i === 0 ? '#8b5cf6' : '#f59e0b');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 400, 400);
+        function renderTools() {
+            const grid = document.getElementById('toolsGrid');
+            grid.innerHTML = '';
 
-                // Add text
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 24px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('AI Generated', 200, 180);
-                ctx.font = '16px Inter';
-                ctx.fillText('Image ' + (i + 1), 200, 220);
+            let tools = [];
+            if (currentCategory === 'all') {
+                Object.values(toolsDB).forEach(cat => tools.push(...cat));
+            } else {
+                tools = toolsDB[currentCategory] || [];
+            }
 
-                // Create image element
-                const imgData = canvas.toDataURL('image/png');
-                state.generatedImages.push(imgData);
+            tools.forEach((tool, index) => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+                card.style.animationDelay = `${index * 0.05}s`;
 
-                const imgDiv = document.createElement('div');
-                imgDiv.className = 'generated-image';
-                imgDiv.innerHTML = `
-                    <img src="${imgData}" alt="Generated ${i + 1}">
-                    <div class="generated-image-info">
-                        <div style="font-size: 12px; color: var(--text-muted);">Variation ${i + 1}</div>
+                card.innerHTML = `
+                    <div class="tool-header">
+                        <div class="tool-icon" style="background: ${tool.color}20; color: ${tool.color}">
+                            ${tool.icon}
+                        </div>
+                        <div class="tool-title">
+                            <h4>${tool.name}</h4>
+                            <span>${tool.category}</span>
+                        </div>
                     </div>
-                    <div class="generated-image-actions">
-                        <button class="btn-icon" onclick="downloadImage('${imgData}', ${i})"><i class="fas fa-download"></i></button>
-                        <button class="btn-icon" onclick="saveImage('${imgData}')"><i class="fas fa-star"></i></button>
+                    <p class="tool-desc">${tool.description}</p>
+                    <div class="tool-actions">
+                        <a href="${tool.url}" target="_blank" class="btn-tool btn-primary-tool">
+                            ⚡ ${tool.action}
+                        </a>
+                        <button class="btn-tool btn-secondary-tool" onclick="copyToolPrompt('${tool.prompt.replace(/'/g, "\'")}')">
+                            📋
+                        </button>
                     </div>
+                    <span class="time-badge">⏱️ Saves ${tool.timeSaved} min</span>
                 `;
-                imageGrid.appendChild(imgDiv);
-            }
-        }
 
-        // Audio Generation (Simulated)
-        async function generateAudio(text) {
-            document.getElementById('tab-audio').style.display = 'flex';
-            // Simulate audio generation
-            state.generatedAudio = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVanu8LdnHgU2k9n1unEiBC13yO/eizEIHWq+8+OZURE'; // Truncated for demo
-            showToast('Audio generated (simulated)', 'success');
-        }
-
-        // Video Thumbnail Generation
-        async function generateVideoThumbnail(prompt) {
-            document.getElementById('tab-video').style.display = 'flex';
-            const thumbnailDiv = document.getElementById('videoThumbnail');
-
-            // Create canvas thumbnail
-            const canvas = document.createElement('canvas');
-            canvas.width = 640;
-            canvas.height = 360;
-            const ctx = canvas.getContext('2d');
-
-            // Background
-            const gradient = ctx.createLinearGradient(0, 0, 640, 360);
-            gradient.addColorStop(0, '#0f172a');
-            gradient.addColorStop(1, '#1e293b');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 640, 360);
-
-            // Title
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 32px Inter';
-            ctx.textAlign = 'center';
-            ctx.fillText('Video Thumbnail', 320, 160);
-            ctx.font = '18px Inter';
-            ctx.fillStyle = '#818cf8';
-            ctx.fillText('AI Generated Preview', 320, 200);
-
-            const imgData = canvas.toDataURL('image/png');
-            thumbnailDiv.innerHTML = `
-                <img src="${imgData}" alt="Video Thumbnail">
-                <div class="video-play-btn"><i class="fas fa-play"></i></div>
-            `;
-        }
-
-        // Download Functions
-        function downloadImage(dataUrl, index) {
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = `generated-image-${index + 1}-${Date.now()}.png`;
-            a.click();
-            showToast('Image downloaded!', 'success');
-        }
-
-        function downloadAllImages() {
-            state.generatedImages.forEach((img, i) => {
-                setTimeout(() => downloadImage(img, i), i * 500);
+                grid.appendChild(card);
             });
         }
 
-        function downloadText() {
-            const text = document.getElementById('outputContentText').textContent;
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `content-${Date.now()}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTools();
         }
 
-        function downloadAudio() {
-            if (!state.generatedAudio) return;
-            const a = document.createElement('a');
-            a.href = state.generatedAudio;
-            a.download = `generated-audio-${Date.now()}.mp3`;
-            a.click();
-            showToast('Audio downloaded!', 'success');
+        function copyToolPrompt(prompt) {
+            navigator.clipboard.writeText(prompt).then(() => {
+                showToast('📋 AI prompt copied!');
+            });
         }
 
-        function downloadVideo() {
-            showToast('Video download started', 'success');
+        // ========================================
+        // UI FUNCTIONS
+        // ========================================
+
+        function showSection(section) {
+            document.querySelectorAll('.tools-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section + 'Section').classList.add('active');
+
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.action-btn').classList.add('active');
         }
 
-        function copyOutput() {
-            const text = document.getElementById('outputContentText').textContent;
-            navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success'));
+        function toggleDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('userDropdown').classList.toggle('show');
         }
 
-        // Export Functions
-        function exportContent(format) {
-            const text = document.getElementById('outputContentText').textContent;
-            let blob, filename;
+        function hideDropdown() {
+            document.getElementById('userDropdown').classList.remove('show');
+        }
 
-            switch(format) {
-                case 'pdf':
-                    // Create simple HTML for PDF
-                    const htmlContent = `<html><body><h1>Generated Content</h1><pre>${text}</pre></body></html>`;
-                    blob = new Blob([htmlContent], { type: 'text/html' });
-                    filename = `content-${Date.now()}.html`;
-                    break;
-                case 'html':
-                    blob = new Blob([`<html><body><pre>${text}</pre></body></html>`], { type: 'text/html' });
-                    filename = `content-${Date.now()}.html`;
-                    break;
-                case 'markdown':
-                    blob = new Blob([text], { type: 'text/markdown' });
-                    filename = `content-${Date.now()}.md`;
-                    break;
+        function toggleSetting(el) {
+            el.classList.toggle('active');
+            const setting = el.id;
+            localStorage.setItem(setting, el.classList.contains('active'));
+        }
+
+        function showProfile() {
+            hideDropdown();
+            showToast('👤 Profile settings coming soon');
+        }
+
+        function showSettings() {
+            hideDropdown();
+            showToast('⚙️ Settings panel coming soon');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-widget')) {
+                hideDropdown();
             }
+        });
 
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast(`Exported as ${format.toUpperCase()}!`, 'success');
+        // ========================================
+        // STATS & HISTORY
+        // ========================================
+
+        function loadStats() {
+            const conversions = parseInt(localStorage.getItem('totalConversions') || '0');
+            const timeSaved = parseInt(localStorage.getItem('totalTimeSaved') || '0');
+
+            document.getElementById('statConversions').textContent = conversions;
+            document.getElementById('statTime').textContent = Math.floor(timeSaved / 60);
+            document.getElementById('statMedia').textContent = conversions * 3; // Estimate
+            document.getElementById('statFormats').textContent = Object.keys(toolsDB).length * 3;
+
+            document.getElementById('usageCount').textContent = conversions;
+            const percent = Math.min((conversions / 100) * 100, 100);
+            document.getElementById('usageBar').style.width = percent + '%';
         }
 
-        // Media Gallery
-        function addToMediaGallery(toolName, content, types) {
-            const mediaItem = {
-                id: Date.now(),
-                tool: toolName,
-                content: content,
-                types: types,
-                timestamp: new Date().toISOString()
-            };
-            state.media.unshift(mediaItem);
-            localStorage.setItem('media', JSON.stringify(state.media));
+        function updateStatsDisplay() {
+            let conversions = parseInt(localStorage.getItem('totalConversions') || '0');
+            let timeSaved = parseInt(localStorage.getItem('totalTimeSaved') || '0');
+
+            conversions++;
+            timeSaved += 187; // Average time saved per conversion
+
+            localStorage.setItem('totalConversions', conversions);
+            localStorage.setItem('totalTimeSaved', timeSaved);
+
+            loadStats();
         }
 
-        function renderMediaGallery(filter = 'all') {
-            const gallery = document.getElementById('mediaGallery');
-            if (state.media.length === 0) {
-                gallery.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-photo-video"></i><h3>No media yet</h3><p>Generate images, audio, and video content using the tools</p></div>';
+        function saveToHistory(filename, duration) {
+            let history = JSON.parse(localStorage.getItem('conversionHistory') || '[]');
+            history.unshift({
+                filename,
+                duration,
+                date: new Date().toISOString(),
+                tools: 12
+            });
+            if (history.length > 10) history.pop();
+            localStorage.setItem('conversionHistory', JSON.stringify(history));
+            renderRecent();
+        }
+
+        function renderRecent() {
+            const history = JSON.parse(localStorage.getItem('conversionHistory') || '[]');
+            const container = document.getElementById('recentList');
+
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">No conversions yet</p>';
                 return;
             }
 
-            const filtered = filter === 'all' ? state.media : state.media.filter(m => m.types.includes(filter));
-
-            gallery.innerHTML = filtered.map(item => `
-                <div class="media-card">
-                    <div class="media-preview">
-                        <i class="fas fa-${item.types.includes('image') ? 'image' : item.types.includes('audio') ? 'music' : 'video'}" style="font-size: 48px; color: var(--primary);"></i>
-                        <span class="media-type-badge">${item.types[0]}</span>
-                    </div>
-                    <div class="media-info">
-                        <div class="media-title">${item.tool}</div>
-                        <div class="media-meta">${formatTimeAgo(item.timestamp)}</div>
-                    </div>
-                    <div class="media-actions">
-                        <button class="btn btn-secondary" style="flex: 1;" onclick="viewMedia(${item.id})">View</button>
-                        <button class="btn btn-primary" style="flex: 1;" onclick="downloadMedia(${item.id})">Download</button>
-                    </div>
+            container.innerHTML = history.slice(0, 5).map(item => `
+                <div style="padding: 0.75rem; background: var(--bg); border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="font-weight: 600; font-size: 0.875rem;">${item.filename}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">${item.duration} • ${new Date(item.date).toLocaleDateString()}</div>
                 </div>
             `).join('');
         }
 
-        function filterMedia(type) {
-            document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderMediaGallery(type);
-        }
+        async function loadUserStats() {
+            if (supabaseClient && currentUser) {
+                const { data, error } = await supabaseClient
+                    .from('conversions')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
 
-        function viewMedia(id) { showToast('Media viewer (simulated)', 'info'); }
-        function downloadMedia(id) { showToast('Download started', 'success'); }
-
-        // History & Saved
-        function addToHistory(toolName, input, output) {
-            const conversion = {
-                id: Date.now(),
-                tool: toolName,
-                input: input,
-                output: output,
-                timestamp: new Date().toISOString()
-            };
-            state.conversions.unshift(conversion);
-            if (state.conversions.length > 50) state.conversions.pop();
-            localStorage.setItem('conversions', JSON.stringify(state.conversions));
-            renderActivityList();
-            renderHistoryList();
-        }
-
-        function renderActivityList() {
-            const list = document.getElementById('activityList');
-            if (state.conversions.length === 0) {
-                list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No conversions yet. Start by selecting a tool above!</p></div>';
-                return;
+                if (data) {
+                    document.getElementById('statConversions').textContent = data.length;
+                    const time = data.reduce((sum, item) => sum + (item.time_saved || 187), 0);
+                    document.getElementById('statTime').textContent = Math.floor(time / 60);
+                }
             }
-            list.innerHTML = state.conversions.slice(0, 5).map(conv => createActivityItem(conv)).join('');
         }
 
-        function renderHistoryList() {
-            const list = document.getElementById('historyList');
-            if (state.conversions.length === 0) {
-                list.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><h3>No history yet</h3><p>Your conversion history will appear here</p></div>';
-                return;
-            }
-            list.innerHTML = state.conversions.map(conv => createActivityItem(conv)).join('');
+        // ========================================
+        // UTILITIES
+        // ========================================
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        function createActivityItem(conv) {
-            return `
-                <div class="activity-item" onclick="viewConversion(${conv.id})">
-                    <div class="activity-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--primary-light);"><i class="fas fa-magic"></i></div>
-                    <div class="activity-content"><div class="activity-title">${conv.tool}</div><div class="activity-meta">${formatTimeAgo(conv.timestamp)}</div></div>
-                    <span class="activity-status status-completed">Completed</span>
-                </div>
-            `;
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function viewConversion(id) {
-            const conv = state.conversions.find(c => c.id === id);
-            if (!conv) return;
-            document.getElementById('modalTitle').textContent = conv.tool;
-            document.getElementById('modalInput').value = conv.input;
-            document.getElementById('outputTabs').style.display = 'flex';
-            document.getElementById('tab-text').style.display = 'flex';
-            document.getElementById('outputSectionText').style.display = 'block';
-            document.getElementById('outputContentText').textContent = conv.output;
-            document.getElementById('convertBtn').innerHTML = '<i class="fas fa-check"></i> Completed';
-            document.getElementById('convertBtn').disabled = true;
-            document.getElementById('toolModal').classList.add('active');
-        }
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            document.getElementById('toastIcon').textContent = message.includes('❌') ? '✕' : '✓';
+            toast.classList.add('show');
 
-        function clearAllHistory() {
-            if (state.conversions.length === 0) return;
-            if (!confirm('Clear all history?')) return;
-            state.conversions = [];
-            state.usage = 0;
-            state.totalChars = 0;
-            localStorage.removeItem('conversions');
-            localStorage.removeItem('usage');
-            localStorage.removeItem('totalChars');
-            renderActivityList();
-            renderHistoryList();
-            updateStats();
-            updateUsageDisplay();
-            showToast('History cleared', 'success');
-        }
-
-        function renderSavedList() {
-            const grid = document.getElementById('savedGrid');
-            if (state.saved.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-star"></i><h3>No saved items</h3><p>Click the star icon on any creation to save it here</p></div>';
-                return;
-            }
-            grid.innerHTML = state.saved.map(item => `
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <div><div class="content-card-title">${item.tool}</div><div class="content-card-meta">${formatTimeAgo(item.timestamp)}</div></div>
-                        <i class="fas fa-star" style="color: var(--warning);"></i>
-                    </div>
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; max-height: 60px; overflow: hidden;">${item.content.substring(0, 100)}...</div>
-                </div>
-            `).join('');
-        }
-
-        function saveImage(imgData) {
-            state.saved.unshift({
-                id: Date.now(),
-                tool: 'Image',
-                content: 'Generated Image',
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem('saved', JSON.stringify(state.saved));
-            showToast('Saved to collection!', 'success');
-        }
-
-        // Stats & Utils
-        function updateStats() {
-            document.getElementById('statConversions').textContent = state.conversions.length;
-            document.getElementById('statMedia').textContent = state.media.length;
-            document.getElementById('statChars').textContent = formatNumber(state.totalChars);
-            document.getElementById('statStreak').textContent = calculateStreak();
-            if (state.conversions.length > 0) document.getElementById('statConversionsChange').textContent = 'Growing!';
-        }
-
-        function updateUsageDisplay() {
-            const maxUsage = 100;
-            const percentage = Math.min((state.usage / maxUsage) * 100, 100);
-            document.getElementById('usageText').textContent = `${state.usage}/${maxUsage} used`;
-            document.getElementById('usageFill').style.width = percentage + '%';
-        }
-
-        function saveProfile() {
-            localStorage.setItem('profileName', document.getElementById('displayName').value);
-            localStorage.setItem('profileEmail', document.getElementById('userEmail').value);
-            showToast('Profile saved!', 'success');
-        }
-
-        function setThemeColor(color) {
-            document.documentElement.style.setProperty('--primary', color);
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            localStorage.setItem('themeColor', color);
-            showToast('Theme updated!', 'success');
-        }
-
-        function toggleSetting(el) { el.classList.toggle('active'); }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-            toast.innerHTML = `<div class="toast-icon"><i class="fas fa-${icon}"></i></div><div><div style="font-weight: 600;">${type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : type === 'warning' ? 'Warning!' : 'Info'}</div><div style="font-size: 13px; color: var(--text-secondary);">${message}</div></div>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
-        }
-
-        function formatNumber(num) {
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return num.toString();
-        }
-
-        function formatTimeAgo(timestamp) {
-            const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
-            if (seconds < 60) return 'Just now';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes}m ago`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours}h ago`;
-            return `${Math.floor(hours / 24)}d ago`;
-        }
-
-        function calculateStreak() {
-            if (state.conversions.length === 0) return 0;
-            return Math.min(state.conversions.length, 30);
-        }
-
-        // Load saved settings
-        const savedName = localStorage.getItem('profileName');
-        const savedEmail = localStorage.getItem('profileEmail');
-        const savedColor = localStorage.getItem('themeColor');
-        if (savedName) document.getElementById('displayName').value = savedName;
-        if (savedEmail) document.getElementById('userEmail').value = savedEmail;
-        if (savedColor) {
-            document.documentElement.style.setProperty('--primary', savedColor);
-            document.querySelectorAll('.color-option').forEach(el => {
-                el.classList.remove('active');
-                if (el.getAttribute('style').includes(savedColor)) el.classList.add('active');
-            });
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
     </script>
 </body>
