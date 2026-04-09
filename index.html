@@ -4,31 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RepurposeAI - Multimedia Content Studio</title>
-    <!-- Supabase Auth -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ========================================
-           YOUR EXISTING STRUCTURE + NEW FEATURES
-           ======================================== */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --secondary: #ec4899;
-            --accent: #8b5cf6;
             --bg: #0f172a;
             --surface: #1e293b;
             --surface-light: #334155;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #10b981;
-            --warning: #f59e0b;
             --error: #ef4444;
             --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         }
@@ -38,72 +27,67 @@
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            line-height: 1.6;
         }
 
-        /* ========================================
-           AUTH MODAL (New - overlays everything)
-           ======================================== */
-        .auth-overlay {
+        /* Auth Overlay */
+        #authOverlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.98);
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 20px;
         }
 
-        .auth-overlay.hidden {
-            display: none;
-        }
+        #authOverlay.hidden { display: none; }
 
         .auth-box {
             background: var(--surface);
-            border-radius: 1.5rem;
-            padding: 2.5rem;
+            border-radius: 16px;
+            padding: 40px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             border: 1px solid var(--surface-light);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
         }
 
         .auth-logo {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 30px;
         }
 
         .auth-logo h1 {
-            font-size: 1.75rem;
+            font-size: 28px;
             background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
+        }
+
+        .auth-logo p {
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
         .auth-tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            gap: 8px;
+            margin-bottom: 24px;
             background: var(--bg);
-            padding: 0.25rem;
-            border-radius: 0.75rem;
+            padding: 4px;
+            border-radius: 8px;
         }
 
         .auth-tab {
             flex: 1;
-            padding: 0.625rem;
+            padding: 10px;
             border: none;
             background: transparent;
             color: var(--text-muted);
             font-weight: 600;
             cursor: pointer;
-            border-radius: 0.5rem;
+            border-radius: 6px;
             transition: all 0.2s;
         }
 
@@ -121,24 +105,26 @@
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 0.375rem;
-            font-size: 0.875rem;
+            margin-bottom: 6px;
+            font-size: 13px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 12px 16px;
             background: var(--bg);
             border: 1px solid var(--surface-light);
-            border-radius: 0.5rem;
+            border-radius: 8px;
             color: var(--text);
-            font-size: 0.9375rem;
+            font-size: 15px;
+            transition: border-color 0.2s;
         }
 
         .form-input:focus {
@@ -148,28 +134,35 @@
 
         .btn-auth {
             width: 100%;
-            padding: 0.875rem;
+            padding: 14px;
             background: var(--gradient);
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 8px;
             color: white;
             font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
-            margin-top: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
         }
 
         .btn-auth:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .auth-divider {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin: 1.25rem 0;
+            gap: 16px;
+            margin: 24px 0;
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 13px;
         }
 
         .auth-divider::before,
@@ -183,31 +176,33 @@
         .social-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
+            gap: 12px;
         }
 
         .btn-social {
-            padding: 0.625rem;
+            padding: 12px;
             background: var(--bg);
             border: 1px solid var(--surface-light);
-            border-radius: 0.5rem;
+            border-radius: 8px;
             color: var(--text);
             cursor: pointer;
+            font-weight: 500;
             transition: all 0.2s;
         }
 
         .btn-social:hover {
             border-color: var(--primary);
+            background: var(--surface-light);
         }
 
         .auth-error {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--error);
             color: var(--error);
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
             display: none;
         }
 
@@ -216,33 +211,39 @@
         }
 
         .spinner {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             display: inline-block;
             vertical-align: middle;
-            margin-right: 0.5rem;
+            margin-right: 8px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* ========================================
-           MAIN LAYOUT (Your Existing Structure)
-           ======================================== */
-
-        .app-container {
+        /* Main App Layout */
+        #appContainer {
             display: none;
+            grid-template-columns: 260px 1fr 300px;
+            min-height: 100vh;
         }
 
-        .app-container.active {
+        #appContainer.active {
             display: grid;
-            grid-template-columns: 280px 1fr 320px;
-            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            #appContainer.active {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-left, .sidebar-right {
+                display: none;
+            }
         }
 
         /* Header */
@@ -250,14 +251,14 @@
             grid-column: 1 / -1;
             background: var(--surface);
             border-bottom: 1px solid var(--surface-light);
-            padding: 1rem 1.5rem;
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .brand {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: 800;
             background: var(--gradient);
             -webkit-background-clip: text;
@@ -267,16 +268,16 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 20px;
         }
 
         .user-widget {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 12px;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            padding: 8px;
+            border-radius: 8px;
             transition: background 0.2s;
             position: relative;
         }
@@ -286,15 +287,15 @@
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: var(--gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 14px;
         }
 
         .user-meta {
@@ -304,26 +305,25 @@
 
         .user-name {
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 14px;
         }
 
         .user-email {
-            font-size: 0.75rem;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
-        /* Dropdown */
         .dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
-            margin-top: 0.5rem;
+            margin-top: 8px;
             background: var(--surface);
             border: 1px solid var(--surface-light);
-            border-radius: 0.75rem;
-            padding: 0.5rem;
-            min-width: 200px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 180px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             display: none;
         }
 
@@ -332,13 +332,14 @@
         }
 
         .dropdown-item {
-            padding: 0.625rem 0.875rem;
-            border-radius: 0.5rem;
+            padding: 10px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 0.625rem;
+            gap: 10px;
+            transition: background 0.2s;
         }
 
         .dropdown-item:hover {
@@ -348,71 +349,81 @@
         .dropdown-divider {
             height: 1px;
             background: var(--surface-light);
-            margin: 0.5rem 0;
+            margin: 8px 0;
         }
 
-        /* Left Sidebar */
+        /* Sidebars */
         .sidebar-left {
             background: var(--surface);
             border-right: 1px solid var(--surface-light);
-            padding: 1.5rem;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .sidebar-right {
+            background: var(--surface);
+            border-left: 1px solid var(--surface-light);
+            padding: 24px;
             overflow-y: auto;
         }
 
         .section-title {
-            font-size: 0.75rem;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.5px;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
             font-weight: 600;
         }
 
-        .stat-cards {
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
+            gap: 12px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
             background: var(--bg);
-            padding: 1rem;
-            border-radius: 0.75rem;
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
         }
 
         .stat-number {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: 700;
             color: var(--primary);
+            line-height: 1;
         }
 
         .stat-label-small {
-            font-size: 0.6875rem;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 0.25rem;
+            margin-top: 6px;
         }
 
         /* Quick Actions */
         .quick-actions {
-            margin-bottom: 2rem;
+            margin-bottom: 32px;
         }
 
         .action-btn {
             width: 100%;
-            padding: 0.875rem;
+            padding: 14px;
             background: var(--bg);
             border: 1px solid var(--surface-light);
-            border-radius: 0.75rem;
+            border-radius: 10px;
             color: var(--text);
             cursor: pointer;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.2s;
-            font-size: 0.9375rem;
         }
 
         .action-btn:hover {
@@ -425,40 +436,39 @@
             border-color: var(--primary);
         }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
-            padding: 1.5rem;
+            padding: 24px;
             overflow-y: auto;
         }
 
         .content-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 24px;
         }
 
         .content-header h2 {
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
+            font-size: 20px;
+            margin-bottom: 6px;
         }
 
         .content-header p {
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 14px;
         }
 
-        /* DRAG & DROP UPLOAD (New Feature) */
+        /* Upload Zone */
         .upload-zone {
             background: var(--surface);
             border: 2px dashed var(--surface-light);
-            border-radius: 1rem;
-            padding: 3rem 2rem;
+            border-radius: 16px;
+            padding: 48px 32px;
             text-align: center;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            transition: all 0.3s;
             cursor: pointer;
         }
 
-        .upload-zone:hover,
-        .upload-zone.dragover {
+        .upload-zone:hover, .upload-zone.dragover {
             border-color: var(--primary);
             background: rgba(99, 102, 241, 0.05);
         }
@@ -470,18 +480,18 @@
         }
 
         .upload-icon-large {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 48px;
+            margin-bottom: 16px;
         }
 
         .upload-text h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
+            font-size: 18px;
+            margin-bottom: 8px;
         }
 
         .upload-text p {
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 14px;
         }
 
         .file-input {
@@ -491,7 +501,7 @@
         .file-display {
             display: none;
             align-items: center;
-            gap: 1rem;
+            gap: 16px;
             justify-content: center;
         }
 
@@ -500,14 +510,14 @@
         }
 
         .file-thumb {
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             background: var(--bg);
-            border-radius: 0.5rem;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 28px;
         }
 
         .file-info-text {
@@ -516,44 +526,40 @@
 
         .file-info-text .name {
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 4px;
+            font-size: 16px;
         }
 
         .file-info-text .meta {
-            font-size: 0.875rem;
+            font-size: 14px;
             color: var(--text-muted);
         }
 
         .remove-btn {
             color: var(--error);
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 8px;
+            font-size: 18px;
+            margin-left: 8px;
         }
 
-        /* Tools Grid */
-        .tools-section {
-            display: none;
-        }
-
-        .tools-section.active {
-            display: block;
-        }
-
+        /* Category Filters */
         .category-filters {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 8px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .filter-btn {
-            padding: 0.5rem 1rem;
+            padding: 8px 16px;
             background: var(--surface);
             border: 1px solid var(--surface-light);
-            border-radius: 2rem;
+            border-radius: 20px;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: 13px;
+            font-weight: 500;
             transition: all 0.2s;
         }
 
@@ -568,88 +574,98 @@
             color: white;
         }
 
+        /* Tools Grid */
+        .tools-section {
+            display: none;
+        }
+
+        .tools-section.active {
+            display: block;
+        }
+
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
         }
 
         .tool-card {
             background: var(--surface);
             border: 1px solid var(--surface-light);
-            border-radius: 1rem;
-            padding: 1.25rem;
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
         }
 
         .tool-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         .tool-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .tool-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 0.625rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 22px;
             background: var(--bg);
         }
 
         .tool-title h4 {
-            font-size: 1rem;
-            margin-bottom: 0.125rem;
+            font-size: 16px;
+            margin-bottom: 2px;
         }
 
         .tool-title span {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .tool-desc {
-            font-size: 0.875rem;
+            font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
             line-height: 1.5;
         }
 
         .tool-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 8px;
         }
 
         .btn-tool {
             flex: 1;
-            padding: 0.625rem;
-            border-radius: 0.5rem;
+            padding: 10px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
             text-align: center;
+            border: none;
         }
 
         .btn-primary-tool {
             background: var(--gradient);
             color: white;
-            border: none;
         }
 
         .btn-primary-tool:hover {
             transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
         }
 
         .btn-secondary-tool {
@@ -664,36 +680,29 @@
         }
 
         .time-badge {
-            display: inline-block;
-            margin-top: 0.75rem;
-            font-size: 0.75rem;
+            display: block;
+            margin-top: 12px;
+            font-size: 12px;
             color: var(--success);
             font-weight: 600;
         }
 
-        /* Right Sidebar */
-        .sidebar-right {
-            background: var(--surface);
-            border-left: 1px solid var(--surface-light);
-            padding: 1.5rem;
-            overflow-y: auto;
-        }
-
+        /* Settings Panel */
         .settings-group {
-            margin-bottom: 2rem;
+            margin-bottom: 32px;
         }
 
         .settings-group h4 {
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-weight: 600;
         }
 
         .setting-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
+            padding: 14px 0;
             border-bottom: 1px solid var(--surface-light);
         }
 
@@ -702,21 +711,20 @@
         }
 
         .setting-label {
-            font-size: 0.875rem;
+            font-size: 14px;
+            margin-bottom: 2px;
         }
 
         .setting-desc {
-            font-size: 0.75rem;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-top: 0.125rem;
         }
 
-        /* Toggle Switch */
         .toggle {
-            width: 44px;
-            height: 24px;
+            width: 48px;
+            height: 26px;
             background: var(--surface-light);
-            border-radius: 12px;
+            border-radius: 13px;
             position: relative;
             cursor: pointer;
             transition: background 0.2s;
@@ -729,8 +737,8 @@
         .toggle::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             background: white;
             border-radius: 50%;
             top: 2px;
@@ -739,38 +747,42 @@
         }
 
         .toggle.active::after {
-            transform: translateX(20px);
+            transform: translateX(22px);
         }
 
         /* Subscription Box */
         .subscription-box {
             background: var(--bg);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            margin-top: 1rem;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
         }
 
         .subscription-box h4 {
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
+            font-size: 14px;
+            margin-bottom: 12px;
         }
 
         .plan-badge {
             display: inline-block;
             background: var(--gradient);
             color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .usage-text {
+            font-size: 14px;
+            margin-bottom: 10px;
         }
 
         .usage-bar {
             height: 6px;
             background: var(--surface-light);
             border-radius: 3px;
-            margin-top: 0.75rem;
             overflow: hidden;
         }
 
@@ -784,16 +796,16 @@
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
+            bottom: 24px;
+            right: 24px;
             background: var(--surface);
             border: 1px solid var(--surface-light);
-            padding: 1rem 1.25rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 12px;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
@@ -805,25 +817,43 @@
             opacity: 1;
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .app-container.active {
-                grid-template-columns: 1fr;
-            }
+        .toast-icon {
+            font-size: 20px;
+        }
 
-            .sidebar-left,
-            .sidebar-right {
-                display: none;
-            }
+        /* Recent List */
+        .recent-item {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .recent-item .filename {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recent-item .meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .empty-text {
+            color: var(--text-muted);
+            font-size: 14px;
+            font-style: italic;
         }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <!-- ========================================
-         AUTHENTICATION OVERLAY
-         ======================================== -->
-    <div class="auth-overlay" id="authOverlay">
+    <!-- Auth Overlay -->
+    <div id="authOverlay">
         <div class="auth-box">
             <div class="auth-logo">
                 <h1>⚡ RepurposeAI</h1>
@@ -837,7 +867,6 @@
 
             <div class="auth-error" id="authError"></div>
 
-            <!-- Login Form -->
             <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label class="form-label">Email</label>
@@ -850,7 +879,6 @@
                 <button type="submit" class="btn-auth" id="loginBtn">Sign In</button>
             </form>
 
-            <!-- Register Form -->
             <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -870,27 +898,24 @@
             <div class="auth-divider">or continue with</div>
 
             <div class="social-buttons">
-                <button class="btn-social" onclick="socialAuth('google')">🔍 Google</button>
-                <button class="btn-social" onclick="socialAuth('github')">🐙 GitHub</button>
+                <button class="btn-social" onclick="socialAuth('google')">Google</button>
+                <button class="btn-social" onclick="socialAuth('github')">GitHub</button>
             </div>
         </div>
     </div>
 
-    <!-- ========================================
-         MAIN APPLICATION (Your Structure)
-         ======================================== -->
-    <div class="app-container" id="appContainer">
-        <!-- Top Header -->
+    <!-- Main App -->
+    <div id="appContainer">
+        <!-- Header -->
         <header class="top-header">
             <div class="brand">⚡ RepurposeAI</div>
             <div class="header-actions">
-                <div class="user-widget" onclick="toggleDropdown(event)">
+                <div class="user-widget" onclick="toggleUserMenu(event)">
                     <div class="user-avatar" id="headerAvatar">?</div>
                     <div class="user-meta">
                         <span class="user-name" id="headerName">Guest</span>
                         <span class="user-email" id="headerEmail">Sign in to save</span>
                     </div>
-
                     <div class="dropdown-menu" id="userDropdown">
                         <div class="dropdown-item" onclick="showProfile()">👤 Profile</div>
                         <div class="dropdown-item" onclick="showSettings()">⚙️ Settings</div>
@@ -905,7 +930,7 @@
         <aside class="sidebar-left">
             <div class="section-title">Overview</div>
 
-            <div class="stat-cards">
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number" id="statConversions">0</div>
                     <div class="stat-label-small">Conversions</div>
@@ -939,7 +964,7 @@
 
             <div class="section-title">Recent</div>
             <div id="recentList">
-                <p style="color: var(--text-muted); font-size: 0.875rem;">No conversions yet</p>
+                <p class="empty-text">No conversions yet</p>
             </div>
         </aside>
 
@@ -952,15 +977,14 @@
                     <p>Upload a video to get AI-powered tool recommendations</p>
                 </div>
 
-                <!-- DRAG & DROP UPLOAD -->
-                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
                     <input type="file" id="fileInput" class="file-input" accept="video/*" onchange="handleFileSelect(event)">
 
-                    <div class="upload-content" id="uploadContent">
+                    <div id="uploadPrompt">
                         <div class="upload-icon-large">📁</div>
                         <div class="upload-text">
                             <h3>Drop your video here</h3>
-                            <p>MP4, MOV, MKV up to 2GB • Drag & drop or click to browse</p>
+                            <p>MP4, MOV, MKV up to 2GB • Drag and drop or click to browse</p>
                         </div>
                     </div>
 
@@ -974,17 +998,15 @@
                     </div>
                 </div>
 
-                <!-- Category Filters -->
                 <div class="category-filters">
                     <button class="filter-btn active" onclick="filterCategory('all')">All Tools</button>
                     <button class="filter-btn" onclick="filterCategory('shorts')">Short Clips</button>
                     <button class="filter-btn" onclick="filterCategory('audio')">Audio</button>
                     <button class="filter-btn" onclick="filterCategory('design')">Thumbnails</button>
                     <button class="filter-btn" onclick="filterCategory('text')">Blog/Text</button>
-                    <button class="filter-btn" onclick="filterCategory('ai-image')">🎨 AI Images</button>
+                    <button class="filter-btn" onclick="filterCategory('ai-image')">AI Images</button>
                 </div>
 
-                <!-- Tools Grid -->
                 <div class="tools-grid" id="toolsGrid"></div>
             </div>
 
@@ -995,7 +1017,7 @@
                     <p>Your recent video processing activity</p>
                 </div>
                 <div id="historyContent">
-                    <p style="color: var(--text-muted);">No history yet. Upload a video to get started!</p>
+                    <p class="empty-text">No history yet. Upload a video to get started!</p>
                 </div>
             </div>
 
@@ -1006,7 +1028,7 @@
                     <p>Your favorite tools and templates</p>
                 </div>
                 <div id="savedContent">
-                    <p style="color: var(--text-muted);">Click the star icon on any tool to save it here</p>
+                    <p class="empty-text">Click the star icon on any tool to save it here</p>
                 </div>
             </div>
         </main>
@@ -1020,21 +1042,21 @@
                         <div class="setting-label">Compact Mode</div>
                         <div class="setting-desc">Reduce padding and spacing</div>
                     </div>
-                    <div class="toggle" id="compactToggle" onclick="toggleSetting(this)"></div>
+                    <div class="toggle" id="toggleCompact" onclick="toggleSetting(this, 'compact')"></div>
                 </div>
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">Animations</div>
                         <div class="setting-desc">Enable smooth transitions</div>
                     </div>
-                    <div class="toggle active" id="animToggle" onclick="toggleSetting(this)"></div>
+                    <div class="toggle active" id="toggleAnim" onclick="toggleSetting(this, 'animations')"></div>
                 </div>
                 <div class="setting-item">
                     <div>
                         <div class="setting-label">Background Effects</div>
                         <div class="setting-desc">Show animated background</div>
                     </div>
-                    <div class="toggle" id="bgToggle" onclick="toggleSetting(this)"></div>
+                    <div class="toggle" id="toggleBg" onclick="toggleSetting(this, 'background')"></div>
                 </div>
             </div>
 
@@ -1042,8 +1064,8 @@
                 <h4>👤 Profile Information</h4>
                 <div class="setting-item">
                     <div>
-                        <div class="setting-label" id="profileName">Display Name</div>
-                        <div class="setting-desc" id="profileEmail">email@example.com</div>
+                        <div class="setting-label" id="profileNameDisplay">Display Name</div>
+                        <div class="setting-desc" id="profileEmailDisplay">email@example.com</div>
                     </div>
                 </div>
             </div>
@@ -1052,7 +1074,7 @@
                 <h4>💎 Subscription</h4>
                 <div class="subscription-box">
                     <span class="plan-badge" id="planBadge">Free Tier</span>
-                    <div style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+                    <div class="usage-text">
                         <span id="usageCount">0</span> / <span id="usageLimit">100</span> conversions
                     </div>
                     <div class="usage-bar">
@@ -1065,14 +1087,14 @@
 
     <!-- Toast -->
     <div class="toast" id="toast">
-        <span id="toastIcon">✓</span>
+        <span class="toast-icon" id="toastIcon">✓</span>
         <span id="toastMessage">Operation successful</span>
     </div>
 
     <script>
-        // ========================================
-        // SUPABASE CONFIG - REPLACE WITH YOURS
-        // ========================================
+        // ==========================================
+        // CONFIGURATION - ADD YOUR SUPABASE HERE
+        // ==========================================
         const SUPABASE_URL = 'https://your-project.supabase.co';
         const SUPABASE_KEY = 'your-anon-key';
 
@@ -1081,14 +1103,14 @@
         let currentFile = null;
         let currentCategory = 'all';
 
-        // Initialize if credentials provided
-        if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes('your-project')) {
+        // Initialize Supabase if credentials provided
+        if (typeof supabase !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes('your-project')) {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
 
-        // ========================================
-        // TOOL DATABASE - ALL SMART LINKS + AI IMAGE GEN
-        // ========================================
+        // ==========================================
+        // TOOL DATABASE
+        // ==========================================
         const toolsDB = {
             shorts: [
                 {
@@ -1097,7 +1119,7 @@
                     icon: '✂️',
                     category: 'shorts',
                     action: 'Auto-Captions',
-                    description: 'AI auto-captions, trending effects, noise removal. Best viral clips.',
+                    description: 'AI auto-captions, trending effects, noise removal. Best for viral clips.',
                     url: 'https://www.capcut.com/tools/video-to-text',
                     timeSaved: 20,
                     prompt: 'Add auto-captions with trending font, remove silent parts, enhance colors',
@@ -1109,7 +1131,7 @@
                     icon: '🎨',
                     category: 'shorts',
                     action: 'Shorts Templates',
-                    description: '1000+ vertical templates. Drag-drop video, auto-resize.',
+                    description: '1000+ vertical templates. Drag-drop video, auto-resize for TikTok/Reels.',
                     url: 'https://www.canva.com/design?create&type=11',
                     timeSaved: 15,
                     prompt: 'Create 3 short clips using trending template with bold text overlays',
@@ -1121,7 +1143,7 @@
                     icon: '🎬',
                     category: 'shorts',
                     action: 'Auto-Compose',
-                    description: 'Microsoft AI detects highlights, auto-cuts, adds music.',
+                    description: 'Microsoft AI detects highlights, auto-cuts, adds background music.',
                     url: 'https://clipchamp.com/en/',
                     timeSaved: 18,
                     prompt: 'Auto-create highlights reel with smart cuts and captions',
@@ -1135,7 +1157,7 @@
                     icon: '🎙️',
                     category: 'audio',
                     action: 'Enhance Speech',
-                    description: 'Studio-quality audio in one click. Removes noise, echo.',
+                    description: 'Studio-quality audio in one click. Removes noise, echo, mouth sounds.',
                     url: 'https://podcast.adobe.com/enhance',
                     timeSaved: 30,
                     prompt: 'Upload audio file for studio-quality enhancement',
@@ -1147,7 +1169,7 @@
                     icon: '📝',
                     category: 'audio',
                     action: 'Transcribe & Edit',
-                    description: 'Edit audio by editing text. Remove filler words auto.',
+                    description: 'Edit audio by editing text. Remove filler words automatically.',
                     url: 'https://web.descript.com/new',
                     timeSaved: 45,
                     prompt: 'Transcribe and remove filler words (ums, ahs) automatically',
@@ -1159,7 +1181,7 @@
                     icon: '🎵',
                     category: 'audio',
                     action: 'Separate Audio',
-                    description: 'Isolate voice or music. Free, no signup needed.',
+                    description: 'Isolate voice or music. Free tool, no signup required.',
                     url: 'https://vocalremover.org/',
                     timeSaved: 10,
                     prompt: 'Separate voice from background noise/music',
@@ -1185,7 +1207,7 @@
                     icon: '✂️',
                     category: 'design',
                     action: 'Remove BG',
-                    description: 'One-click background removal. Clean cutouts.',
+                    description: 'One-click background removal. Clean cutouts for thumbnails.',
                     url: 'https://www.remove.bg/',
                     timeSaved: 8,
                     prompt: 'Remove background from subject for clean thumbnail cutout',
@@ -1211,7 +1233,7 @@
                     icon: '🤖',
                     category: 'text',
                     action: 'Blog Post',
-                    description: 'Transcript → SEO article. Headings, keywords, quotes.',
+                    description: 'Transcript to SEO article. Headings, keywords, social quotes.',
                     url: 'https://chat.openai.com',
                     timeSaved: 60,
                     prompt: 'Convert this video transcript to a 1000-word blog post with H2 headings, key takeaways box, and SEO keywords. Include 3 pull quotes for social media.',
@@ -1223,7 +1245,7 @@
                     icon: '📄',
                     category: 'text',
                     action: 'Content Calendar',
-                    description: 'Schedule posts, track status, organize assets.',
+                    description: 'Schedule posts, track status, organize all assets.',
                     url: 'https://www.notion.so/pages/new',
                     timeSaved: 30,
                     prompt: 'Create content calendar with repurposed assets from this video',
@@ -1249,10 +1271,10 @@
                     icon: '🎨',
                     category: 'ai-image',
                     action: 'Generate Art',
-                    description: 'AI image generation from text prompts. Stunning visuals.',
+                    description: 'High-quality AI images from text. Best for thumbnails.',
                     url: 'https://www.midjourney.com/',
                     timeSaved: 120,
-                    prompt: 'Create thumbnail background: [describe video topic], vibrant colors, cinematic lighting, 16:9, professional, eye-catching',
+                    prompt: 'Create thumbnail background: [describe video topic], vibrant colors, cinematic lighting, 16:9, professional, eye-catching --ar 16:9',
                     color: '#1a1a2e'
                 },
                 {
@@ -1261,7 +1283,7 @@
                     icon: '🖼️',
                     category: 'ai-image',
                     action: 'AI Images',
-                    description: 'ChatGPT-integrated image gen. Edit existing images.',
+                    description: 'ChatGPT-integrated image generation. Edit existing.',
                     url: 'https://chat.openai.com',
                     timeSaved: 90,
                     prompt: 'Generate 3 thumbnail concepts for video about [topic]: 1) Shocked reaction style, 2) Curiosity gap style, 3) Comparison split-screen style',
@@ -1273,7 +1295,7 @@
                     icon: '🎭',
                     category: 'ai-image',
                     action: 'Free AI Art',
-                    description: '150 free credits/day. Great for thumbnails, banners.',
+                    description: '150 free credits daily. Great for thumbnails, banners.',
                     url: 'https://leonardo.ai/',
                     timeSaved: 60,
                     prompt: 'Create YouTube thumbnail: [topic], bold colors, text space, 1280x720, professional photography style',
@@ -1288,7 +1310,7 @@
                     description: 'Best for images WITH text. Free, no watermark.',
                     url: 'https://ideogram.ai/',
                     timeSaved: 45,
-                    prompt: 'Thumbnail with text "[VIDEO TITLE]", bold typography, [topic] imagery, 16:9, vibrant',
+                    prompt: 'Thumbnail with text "[VIDEO TITLE]", bold typography, [topic] imagery, 16:9, vibrant colors',
                     color: '#ec4899'
                 },
                 {
@@ -1297,10 +1319,10 @@
                     icon: '🔍',
                     category: 'ai-image',
                     action: 'Free DALL·E',
-                    description: 'Microsoft's free DALL·E. 15 boosts/day, then slow.',
+                    description: 'Microsoft free DALL·E. 15 boosts/day, unlimited slow.',
                     url: 'https://www.bing.com/create',
                     timeSaved: 60,
-                    prompt: 'YouTube thumbnail, [topic], professional, high contrast, clickable',
+                    prompt: 'YouTube thumbnail, [topic], professional, high contrast, clickable, 16:9',
                     color: '#00809d'
                 },
                 {
@@ -1312,37 +1334,49 @@
                     description: 'Text-to-image inside Canva. Integrated workflow.',
                     url: 'https://www.canva.com/magic/',
                     timeSaved: 30,
-                    prompt: 'Generate image: [describe scene], suitable for video thumbnail, eye-catching',
+                    prompt: 'Generate image: [describe scene], suitable for video thumbnail, eye-catching, professional',
                     color: '#00c4cc'
                 }
             ]
         };
 
-        // ========================================
+        // ==========================================
         // AUTH FUNCTIONS
-        // ========================================
+        // ==========================================
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Check for existing session
             if (supabaseClient) {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                     currentUser = session.user;
-                    enterApp();
+                    showApp();
                 }
             }
 
-            // Setup drag & drop
+            // Setup drag and drop
             setupDragDrop();
+
+            // Render initial tools
             renderTools();
+
+            // Load stats
             loadStats();
+
+            // Load saved settings
+            loadSettings();
         });
 
         function switchTab(tab) {
+            // Update tab buttons
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
+            // Show correct form
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
             document.getElementById(tab + 'Form').classList.add('active');
+
+            // Hide error
             hideError();
         }
 
@@ -1350,15 +1384,16 @@
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
 
+            // Demo mode if no Supabase
             if (!supabaseClient) {
-                // Demo mode
                 btn.innerHTML = '<span class="spinner"></span> Signing in...';
                 setTimeout(() => {
                     currentUser = { 
                         email: document.getElementById('loginEmail').value,
                         user_metadata: { full_name: 'Demo User' }
                     };
-                    enterApp();
+                    showApp();
+                    showToast('✅ Demo mode: Signed in successfully');
                 }, 1000);
                 return;
             }
@@ -1377,7 +1412,8 @@
                 btn.textContent = 'Sign In';
             } else {
                 currentUser = data.user;
-                enterApp();
+                showApp();
+                showToast('✅ Signed in successfully');
             }
         }
 
@@ -1392,7 +1428,8 @@
                         email: document.getElementById('registerEmail').value,
                         user_metadata: { full_name: document.getElementById('registerName').value }
                     };
-                    enterApp();
+                    showApp();
+                    showToast('✅ Demo account created');
                 }, 1000);
                 return;
             }
@@ -1414,26 +1451,24 @@
                 btn.textContent = 'Create Account';
             } else {
                 currentUser = data.user;
-                showToast('✅ Check your email to confirm!');
-                enterApp();
+                showApp();
+                showToast('✅ Check your email to confirm account');
             }
         }
 
         async function socialAuth(provider) {
             if (!supabaseClient) {
-                showError('Supabase not configured. Please add your credentials.');
+                showError('Please configure Supabase credentials to enable social login');
                 return;
             }
 
             await supabaseClient.auth.signInWithOAuth({
                 provider: provider,
-                options: {
-                    redirectTo: window.location.origin
-                }
+                options: { redirectTo: window.location.origin }
             });
         }
 
-        function enterApp() {
+        function showApp() {
             document.getElementById('authOverlay').classList.add('hidden');
             document.getElementById('appContainer').classList.add('active');
 
@@ -1445,9 +1480,10 @@
             document.getElementById('headerName').textContent = name;
             document.getElementById('headerEmail').textContent = email;
             document.getElementById('headerAvatar').textContent = initials;
-            document.getElementById('profileName').textContent = name;
-            document.getElementById('profileEmail').textContent = email;
+            document.getElementById('profileNameDisplay').textContent = name;
+            document.getElementById('profileEmailDisplay').textContent = email;
 
+            // Load user data
             loadUserStats();
         }
 
@@ -1458,7 +1494,11 @@
             currentUser = null;
             document.getElementById('authOverlay').classList.remove('hidden');
             document.getElementById('appContainer').classList.remove('active');
-            hideDropdown();
+            hideUserMenu();
+
+            // Reset forms
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
         }
 
         function showError(msg) {
@@ -1471,9 +1511,9 @@
             document.getElementById('authError').classList.remove('show');
         }
 
-        // ========================================
-        // DRAG & DROP + FILE HANDLING
-        // ========================================
+        // ==========================================
+        // DRAG & DROP FUNCTIONS
+        // ==========================================
 
         function setupDragDrop() {
             const zone = document.getElementById('uploadZone');
@@ -1492,12 +1532,20 @@
                 zone.classList.remove('dragover');
 
                 const files = e.dataTransfer.files;
-                if (files.length > 0 && files[0].type.startsWith('video/')) {
-                    processFile(files[0]);
-                } else {
-                    showToast('❌ Please drop a video file');
+                if (files.length > 0) {
+                    if (files[0].type.startsWith('video/')) {
+                        processFile(files[0]);
+                    } else {
+                        showToast('❌ Please upload a video file (MP4, MOV, MKV)');
+                    }
                 }
             });
+        }
+
+        function triggerFileInput() {
+            if (!currentFile) {
+                document.getElementById('fileInput').click();
+            }
         }
 
         function handleFileSelect(e) {
@@ -1508,8 +1556,8 @@
         function processFile(file) {
             currentFile = file;
 
-            // Show file in upload zone
-            document.getElementById('uploadContent').style.display = 'none';
+            // Show file display
+            document.getElementById('uploadPrompt').style.display = 'none';
             document.getElementById('fileDisplay').classList.add('show');
             document.getElementById('uploadZone').classList.add('has-file');
 
@@ -1524,27 +1572,27 @@
                 const size = formatBytes(file.size);
                 document.getElementById('displayFileMeta').textContent = `${size} • ${duration}`;
 
-                // Save to history
+                // Save to history and update stats
                 saveToHistory(file.name, duration);
-                updateStatsDisplay();
+                updateStats();
             };
             video.src = URL.createObjectURL(file);
 
-            showToast('✅ File ready! Choose a tool below');
+            showToast('✅ File uploaded! Choose a tool below');
         }
 
         function removeFile(e) {
             e.stopPropagation();
             currentFile = null;
             document.getElementById('fileInput').value = '';
-            document.getElementById('uploadContent').style.display = 'block';
+            document.getElementById('uploadPrompt').style.display = 'block';
             document.getElementById('fileDisplay').classList.remove('show');
             document.getElementById('uploadZone').classList.remove('has-file');
         }
 
-        // ========================================
+        // ==========================================
         // TOOLS RENDERING
-        // ========================================
+        // ==========================================
 
         function renderTools() {
             const grid = document.getElementById('toolsGrid');
@@ -1557,10 +1605,9 @@
                 tools = toolsDB[currentCategory] || [];
             }
 
-            tools.forEach((tool, index) => {
+            tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = 'tool-card';
-                card.style.animationDelay = `${index * 0.05}s`;
 
                 card.innerHTML = `
                     <div class="tool-header">
@@ -1577,7 +1624,7 @@
                         <a href="${tool.url}" target="_blank" class="btn-tool btn-primary-tool">
                             ⚡ ${tool.action}
                         </a>
-                        <button class="btn-tool btn-secondary-tool" onclick="copyToolPrompt('${tool.prompt.replace(/'/g, "\'")}')">
+                        <button class="btn-tool btn-secondary-tool" onclick="copyPrompt('${escapeHtml(tool.prompt)}')">
                             📋
                         </button>
                     </div>
@@ -1590,63 +1637,92 @@
 
         function filterCategory(cat) {
             currentCategory = cat;
+
+            // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
+
             renderTools();
         }
 
-        function copyToolPrompt(prompt) {
+        function copyPrompt(prompt) {
             navigator.clipboard.writeText(prompt).then(() => {
-                showToast('📋 AI prompt copied!');
+                showToast('📋 AI prompt copied to clipboard!');
+            }).catch(() => {
+                showToast('❌ Failed to copy. Please copy manually.');
             });
         }
 
-        // ========================================
-        // UI FUNCTIONS
-        // ========================================
+        function escapeHtml(text) {
+            return text.replace(/'/g, "\'").replace(/"/g, '\"');
+        }
+
+        // ==========================================
+        // NAVIGATION & UI
+        // ==========================================
 
         function showSection(section) {
+            // Hide all sections
             document.querySelectorAll('.tools-section').forEach(s => s.classList.remove('active'));
+
+            // Show selected
             document.getElementById(section + 'Section').classList.add('active');
 
+            // Update sidebar buttons
             document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
             event.target.closest('.action-btn').classList.add('active');
         }
 
-        function toggleDropdown(e) {
+        function toggleUserMenu(e) {
             e.stopPropagation();
             document.getElementById('userDropdown').classList.toggle('show');
         }
 
-        function hideDropdown() {
+        function hideUserMenu() {
             document.getElementById('userDropdown').classList.remove('show');
         }
 
-        function toggleSetting(el) {
-            el.classList.toggle('active');
-            const setting = el.id;
-            localStorage.setItem(setting, el.classList.contains('active'));
-        }
-
         function showProfile() {
-            hideDropdown();
-            showToast('👤 Profile settings coming soon');
+            hideUserMenu();
+            showToast('👤 Profile settings coming in next update');
         }
 
         function showSettings() {
-            hideDropdown();
-            showToast('⚙️ Settings panel coming soon');
+            hideUserMenu();
+            showToast('⚙️ Full settings panel coming in next update');
         }
 
+        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.user-widget')) {
-                hideDropdown();
+                hideUserMenu();
             }
         });
 
-        // ========================================
+        function toggleSetting(el, settingName) {
+            el.classList.toggle('active');
+            const isActive = el.classList.contains('active');
+            localStorage.setItem('setting_' + settingName, isActive);
+
+            // Apply setting
+            if (settingName === 'compact') {
+                document.body.classList.toggle('compact-mode', isActive);
+            }
+        }
+
+        function loadSettings() {
+            const compact = localStorage.getItem('setting_compact') === 'true';
+            const animations = localStorage.getItem('setting_animations') !== 'false'; // default true
+            const background = localStorage.getItem('setting_background') === 'true';
+
+            if (compact) document.getElementById('toggleCompact').classList.add('active');
+            if (!animations) document.getElementById('toggleAnim').classList.remove('active');
+            if (background) document.getElementById('toggleBg').classList.add('active');
+        }
+
+        // ==========================================
         // STATS & HISTORY
-        // ========================================
+        // ==========================================
 
         function loadStats() {
             const conversions = parseInt(localStorage.getItem('totalConversions') || '0');
@@ -1654,15 +1730,17 @@
 
             document.getElementById('statConversions').textContent = conversions;
             document.getElementById('statTime').textContent = Math.floor(timeSaved / 60);
-            document.getElementById('statMedia').textContent = conversions * 3; // Estimate
-            document.getElementById('statFormats').textContent = Object.keys(toolsDB).length * 3;
+            document.getElementById('statMedia').textContent = conversions * 3;
+            document.getElementById('statFormats').textContent = '18';
 
             document.getElementById('usageCount').textContent = conversions;
             const percent = Math.min((conversions / 100) * 100, 100);
             document.getElementById('usageBar').style.width = percent + '%';
+
+            renderRecent();
         }
 
-        function updateStatsDisplay() {
+        function updateStats() {
             let conversions = parseInt(localStorage.getItem('totalConversions') || '0');
             let timeSaved = parseInt(localStorage.getItem('totalTimeSaved') || '0');
 
@@ -1678,10 +1756,9 @@
         function saveToHistory(filename, duration) {
             let history = JSON.parse(localStorage.getItem('conversionHistory') || '[]');
             history.unshift({
-                filename,
-                duration,
-                date: new Date().toISOString(),
-                tools: 12
+                filename: filename,
+                duration: duration,
+                date: new Date().toISOString()
             });
             if (history.length > 10) history.pop();
             localStorage.setItem('conversionHistory', JSON.stringify(history));
@@ -1693,14 +1770,14 @@
             const container = document.getElementById('recentList');
 
             if (history.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">No conversions yet</p>';
+                container.innerHTML = '<p class="empty-text">No conversions yet</p>';
                 return;
             }
 
             container.innerHTML = history.slice(0, 5).map(item => `
-                <div style="padding: 0.75rem; background: var(--bg); border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                    <div style="font-weight: 600; font-size: 0.875rem;">${item.filename}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">${item.duration} • ${new Date(item.date).toLocaleDateString()}</div>
+                <div class="recent-item">
+                    <div class="filename">${escapeHtml(item.filename)}</div>
+                    <div class="meta">${item.duration} • ${new Date(item.date).toLocaleDateString()}</div>
                 </div>
             `).join('');
         }
@@ -1712,7 +1789,7 @@
                     .select('*')
                     .eq('user_id', currentUser.id);
 
-                if (data) {
+                if (data && data.length > 0) {
                     document.getElementById('statConversions').textContent = data.length;
                     const time = data.reduce((sum, item) => sum + (item.time_saved || 187), 0);
                     document.getElementById('statTime').textContent = Math.floor(time / 60);
@@ -1720,9 +1797,9 @@
             }
         }
 
-        // ========================================
+        // ==========================================
         // UTILITIES
-        // ========================================
+        // ==========================================
 
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
@@ -1740,8 +1817,12 @@
 
         function showToast(message) {
             const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').textContent = message;
-            document.getElementById('toastIcon').textContent = message.includes('❌') ? '✕' : '✓';
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+
+            msg.textContent = message;
+            icon.textContent = message.includes('❌') ? '✕' : '✓';
+
             toast.classList.add('show');
 
             setTimeout(() => {
